@@ -11,8 +11,8 @@
 @interface NSData (CDZSecurityExtension)
 
 // Base64
-+ (NSData*)dataFromBase64String:(NSString*)str;
-- (NSString*)base64EncodedString;
++ (NSData*)dataFromBase64String:(NSString*)str NS_AVAILABLE(10_9, 7_0);
+- (NSString*)base64EncodedString NS_AVAILABLE(10_9, 7_0);
 
 // DES
 - (NSData *)DESEncryptWithKey:(NSString *)key;
