@@ -116,6 +116,7 @@
 @end
 
 @interface UIApplication (CDZApplicationExtension)
+- (UIViewController*)topViewController;
 - (UIWindow*)appWindow;
 @end
 
@@ -135,7 +136,6 @@
 #pragma mark - NSObject
 @interface NSObject (CDZObjectExtension)
 +(NSString*)classString;
-+(UIViewController*)topViewController;
 @end
 
 @interface NSString (CDZStringExtension)

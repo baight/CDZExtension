@@ -1,6 +1,6 @@
 //
 //  CDZExtension.m
-//
+//  
 //
 //  Created by baight on 14-8-21.
 //  Copyright (c) 2014年 baight. All rights reserved.
@@ -360,6 +360,37 @@
 @end
 
 @implementation UIApplication (CDZApplicationExtension)
+- (UIViewController*)topViewController{
+    UIWindow * window = [self keyWindow];
+    if (window.windowLevel != UIWindowLevelNormal){
+        NSArray *windows = [self windows];
+        for(UIWindow * tmpWin in windows){
+            if (tmpWin.windowLevel == UIWindowLevelNormal && !tmpWin.hidden){
+                window = tmpWin;
+                break;
+            }
+        }
+    }
+    UIView *frontView = [[window subviews] firstObject];
+    UIViewController* controller = [frontView viewController];
+    do{
+        while (controller.presentedViewController) {
+            controller = controller.presentedViewController;
+        }
+        if ([controller isKindOfClass:[UINavigationController class]]){
+            UINavigationController* nav = (UINavigationController*)controller;
+            controller = [nav topViewController];
+        }
+        else if ([controller isKindOfClass:[UIViewController class]]){
+            controller = controller;
+        }
+        else{
+            controller = window.rootViewController;
+        }
+    } while (controller.presentedViewController);
+    
+    return controller;
+}
 - (UIWindow*)appWindow{
     UIWindow* appWindow = self.keyWindow;
     if(appWindow.windowLevel != UIWindowLevelNormal){
@@ -412,32 +443,6 @@
 @implementation NSObject (CDZObjectExtension)
 +(NSString*)classString{
     return NSStringFromClass([self class]);
-}
-+(UIViewController*)topViewController{
-    UIViewController *result = nil;
-    UIWindow * window = [[UIApplication sharedApplication] keyWindow];
-    if (window.windowLevel != UIWindowLevelNormal){
-        NSArray *windows = [[UIApplication sharedApplication] windows];
-        for(UIWindow * tmpWin in windows){
-            if (tmpWin.windowLevel == UIWindowLevelNormal && !tmpWin.hidden){
-                window = tmpWin;
-                break;
-            }
-        }
-    }
-    UIView *frontView = [[window subviews] firstObject];
-    UIViewController* controller = [frontView viewController];
-    if ([controller isKindOfClass:[UINavigationController class]]){
-        UINavigationController* nav = (UINavigationController*)controller;
-        result = [nav topViewController];
-    }
-    else if ([controller isKindOfClass:[UIViewController class]]){
-        result = controller;
-    }
-    else{
-        result = window.rootViewController;
-    }
-    return result;
 }
 @end
 
