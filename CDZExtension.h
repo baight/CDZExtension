@@ -57,6 +57,12 @@
 //获取 view 的 controller
 - (UIViewController *)viewController;
 
+-(void)addTopLine:(UIColor*)color;
+-(void)addTopLine:(UIColor*)color leftMargin:(CGFloat)leftMargin;
+-(void)addTopLine:(UIColor *)color yOffset:(CGFloat)yOffset leftMargin:(CGFloat)leftMargin;
+-(void)addBottomLine:(UIColor*)color;
+-(void)addBottomLine:(UIColor*)color yOffset:(CGFloat)yOffset leftMargin:(CGFloat)leftMargin;
+-(void)addLeftLine:(UIColor*)color xOffset:(CGFloat)xOffset;
 @end
 
 @interface UIScrollView (CDZScrollViewExtension)
@@ -95,6 +101,10 @@
 -(UITableView*)tableView;
 @end
 
+@interface UINavigationBar (CDZNavigationBarExtension)
+@property (readwrite) UIColor* titleColor;
+@end
+
 @interface UIScreen (CDZScreenExtension)
 -(CGFloat)width;
 -(CGFloat)height;
@@ -103,6 +113,9 @@
 @interface UIColor (CDZColorExtension)
 +(UIColor*)colorWithHexadecimal:(long)hexColor;
 +(UIColor*)colorWithHexadecimal:(long)hexColor alpha:(float)opacity;
+-(UIColor*)lightColor;
+-(UIColor*)darkColor;
+-(UIColor*)disableColor;
 @end
 
 #pragma mark - UIViewController

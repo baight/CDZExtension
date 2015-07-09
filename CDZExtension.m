@@ -1,6 +1,6 @@
 //
 //  CDZExtension.m
-//  
+//
 //
 //  Created by baight on 14-8-21.
 //  Copyright (c) 2014年 baight. All rights reserved.
@@ -186,6 +186,34 @@
     return nil;
 }
 
+-(void)addBottomLine:(UIColor*)color{
+    [self addBottomLine:color yOffset:0 leftMargin:0];
+}
+-(void)addBottomLine:(UIColor*)color yOffset:(CGFloat)yOffset leftMargin:(CGFloat)leftMargin{
+    UIView* v = [[UIView alloc]initWithFrame:CGRectMake(leftMargin, self.height-0.5 + yOffset, self.width-leftMargin, 0.5)];
+    v.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleWidth;
+    v.backgroundColor = color;
+    [self addSubview:v];
+}
+-(void)addTopLine:(UIColor*)color{
+    [self addTopLine:color leftMargin:0];
+}
+-(void)addTopLine:(UIColor*)color leftMargin:(CGFloat)leftMargin{
+    [self addTopLine:color yOffset:0 leftMargin:leftMargin];
+}
+-(void)addTopLine:(UIColor *)color yOffset:(CGFloat)yOffset leftMargin:(CGFloat)leftMargin{
+    UIView* v = [[UIView alloc]initWithFrame:CGRectMake(leftMargin, -0.5 + yOffset, self.width-leftMargin, 0.5)];
+    v.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+    v.backgroundColor = color;
+    [self addSubview:v];
+}
+-(void)addLeftLine:(UIColor*)color xOffset:(CGFloat)xOffset{
+    UIView* v = [[UIView alloc]initWithFrame:CGRectMake(0, 0, 0.5, self.height)];
+    v.autoresizingMask = UIViewAutoresizingFlexibleHeight;
+    v.backgroundColor = color;
+    [self addSubview:v];
+}
+
 @end
 
 @implementation UIScrollView (CDZScrollViewExtension)
@@ -316,6 +344,22 @@
 }
 @end
 
+@implementation UINavigationBar (CDZNavigationBarExtension)
+-(void)setTitleColor:(UIColor *)titleColor{
+    NSMutableDictionary* dic;
+    if(self.titleTextAttributes == nil){
+        dic = [[NSMutableDictionary alloc]init];
+    }else{
+        dic = [[NSMutableDictionary alloc]initWithDictionary:self.titleTextAttributes];
+    }
+    [dic setObject:titleColor forKey:NSForegroundColorAttributeName];
+    self.titleTextAttributes = dic;
+}
+-(UIColor*)titleColor{
+    return self.titleTextAttributes[NSForegroundColorAttributeName];
+}
+@end
+
 @implementation UIScreen (CDZScreenExtension)
 -(CGFloat)width{
     return self.bounds.size.width;
@@ -334,6 +378,27 @@
     float green = ((float)((hexColor & 0xFF00) >> 8))/255.0;
     float blue = ((float)(hexColor & 0xFF))/255.0;
     return [UIColor colorWithRed:red green:green blue:blue alpha:opacity];
+}
+-(UIColor*)lightColor{
+    CGFloat r, g, b, a;
+    [self getRed:&r green:&g blue:&b alpha:&a];
+    return [UIColor colorWithRed:(1+r)/2 green:(1+g)/2 blue:(1+b)/2 alpha:a];
+}
+-(UIColor*)darkColor{
+    CGFloat r, g, b, a;
+    [self getRed:&r green:&g blue:&b alpha:&a];
+    return [UIColor colorWithRed:r/2 green:g/2 blue:b/2 alpha:a];
+}
+-(UIColor*)disableColor{
+    CGFloat r, g, b, a;
+    [self getRed:&r green:&g blue:&b alpha:&a];
+    CGFloat va = (r + g + b) / 3;
+    if(va > 0.5){
+        return [UIColor colorWithRed:(va+r)/2/2 green:(va+g)/2/2 blue:(va+b)/2/2 alpha:a];
+    }
+    else{
+        return [UIColor colorWithRed:(1+(va+r)/2)/2 green:(1+(va+g)/2)/2 blue:(1+(va+b)/2)/2 alpha:a];
+    }
 }
 @end
 
