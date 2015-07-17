@@ -186,30 +186,39 @@
     return nil;
 }
 
--(void)addBottomLine:(UIColor*)color{
-    [self addBottomLine:color yOffset:0 leftMargin:0];
-}
--(void)addBottomLine:(UIColor*)color yOffset:(CGFloat)yOffset leftMargin:(CGFloat)leftMargin{
-    UIView* v = [[UIView alloc]initWithFrame:CGRectMake(leftMargin, self.height-0.5 + yOffset, self.width-leftMargin, 0.5)];
-    v.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleWidth;
-    v.backgroundColor = color;
-    [self addSubview:v];
-}
 -(void)addTopLine:(UIColor*)color{
-    [self addTopLine:color leftMargin:0];
+    [self addTopLine:color edgeInsets:UIEdgeInsetsMake(0, 0, 0, 0)];
 }
--(void)addTopLine:(UIColor*)color leftMargin:(CGFloat)leftMargin{
-    [self addTopLine:color yOffset:0 leftMargin:leftMargin];
-}
--(void)addTopLine:(UIColor *)color yOffset:(CGFloat)yOffset leftMargin:(CGFloat)leftMargin{
-    UIView* v = [[UIView alloc]initWithFrame:CGRectMake(leftMargin, -0.5 + yOffset, self.width-leftMargin, 0.5)];
+- (void)addTopLine:(UIColor *)color edgeInsets:(UIEdgeInsets)insets{
+    UIView* v = [[UIView alloc]initWithFrame:CGRectMake(insets.left, -0.5 + insets.top, self.width-insets.left - insets.right, 0.5)];
     v.autoresizingMask = UIViewAutoresizingFlexibleWidth;
     v.backgroundColor = color;
     [self addSubview:v];
 }
--(void)addLeftLine:(UIColor*)color xOffset:(CGFloat)xOffset{
-    UIView* v = [[UIView alloc]initWithFrame:CGRectMake(0, 0, 0.5, self.height)];
+-(void)addBottomLine:(UIColor*)color{
+    [self addBottomLine:color edgeInsets:UIEdgeInsetsMake(0, 0, 0, 0)];
+}
+-(void)addBottomLine:(UIColor*)color edgeInsets:(UIEdgeInsets)insets;{
+    UIView* v = [[UIView alloc]initWithFrame:CGRectMake(insets.left, self.height-0.5 - insets.bottom, self.width - insets.left - insets.right, 0.5)];
+    v.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleWidth;
+    v.backgroundColor = color;
+    [self addSubview:v];
+}
+-(void)addLeftLine:(UIColor*)color{
+    [self addLeftLine:color edgeInsets:UIEdgeInsetsMake(0, 0, 0, 0)];
+}
+-(void)addLeftLine:(UIColor*)color edgeInsets:(UIEdgeInsets)insets{
+    UIView* v = [[UIView alloc]initWithFrame:CGRectMake(insets.left, insets.top, 0.5, self.height - insets.top - insets.bottom)];
     v.autoresizingMask = UIViewAutoresizingFlexibleHeight;
+    v.backgroundColor = color;
+    [self addSubview:v];
+}
+-(void)addRightLine:(UIColor*)color{
+    [self addRightLine:color edgeInsets:UIEdgeInsetsMake(0, 0, 0, 0)];
+}
+-(void)addRightLine:(UIColor*)color edgeInsets:(UIEdgeInsets)insets{
+    UIView* v = [[UIView alloc]initWithFrame:CGRectMake(self.width - 0.5 - insets.right, insets.top, 0.5, self.height - insets.top - insets.bottom)];
+    v.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleHeight;
     v.backgroundColor = color;
     [self addSubview:v];
 }

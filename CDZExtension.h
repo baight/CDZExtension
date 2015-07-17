@@ -57,12 +57,18 @@
 //获取 view 的 controller
 - (UIViewController *)viewController;
 
--(void)addTopLine:(UIColor*)color;
--(void)addTopLine:(UIColor*)color leftMargin:(CGFloat)leftMargin;
--(void)addTopLine:(UIColor *)color yOffset:(CGFloat)yOffset leftMargin:(CGFloat)leftMargin;
+- (void)addTopLine:(UIColor*)color;
+- (void)addTopLine:(UIColor *)color edgeInsets:(UIEdgeInsets)insets;
+
+
 -(void)addBottomLine:(UIColor*)color;
--(void)addBottomLine:(UIColor*)color yOffset:(CGFloat)yOffset leftMargin:(CGFloat)leftMargin;
--(void)addLeftLine:(UIColor*)color xOffset:(CGFloat)xOffset;
+-(void)addBottomLine:(UIColor*)color edgeInsets:(UIEdgeInsets)insets;
+
+-(void)addLeftLine:(UIColor*)color;
+-(void)addLeftLine:(UIColor*)color edgeInsets:(UIEdgeInsets)insets;
+
+-(void)addRightLine:(UIColor*)color;
+-(void)addRightLine:(UIColor*)color edgeInsets:(UIEdgeInsets)insets;
 @end
 
 @interface UIScrollView (CDZScrollViewExtension)
