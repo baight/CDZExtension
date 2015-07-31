@@ -15,13 +15,12 @@
 #define GCDAsyncInMain(block)        dispatch_async(dispatch_get_main_queue(), (block))
 #define GCDSyncInMain(block)         dispatch_sync(dispatch_get_main_queue(), (block))
 #define GCDAsyncInBackground(block)  dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), (block))
-#define GCDsyncInBackground(block)   dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), (block))
+#define GCDSyncInBackground(block)   dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), (block))
 
 #define StringNotNil(str) (str ? str : @"")
 
 #pragma mark - UIView
 @interface UIView (CDZViewExtension)
-+(id)loadFromBundleWithOwner:(id)owner;
 
 @property (nonatomic, assign) CGFloat x;
 @property (nonatomic, assign) CGFloat y;
@@ -38,10 +37,15 @@
 @property (nonatomic, getter=x, setter=setX:) CGFloat left;
 @property (nonatomic, getter=y, setter=setY:) CGFloat top;
 
-
 @property (nonatomic, assign) CGFloat cornerRadius;
 @property (nonatomic, strong) UIColor* borderColor;
 @property (nonatomic, assign) CGFloat borderWidth;
+
+// 从xib中加载视图
+// 如果视图是 UITableViewCell或其子类，则自动设置 cell的reuseIdentifier 为类名
+// 如果是cell，建议与 UITableViewCell的扩展方法 reusableCellFromTable: 一起使用
+// reusableCellFromTable: 的作用是：从tableView的回收cell里，取出一个 reuseIdentifier为cell类名一个cell
++(id)loadFromBundleWithOwner:(id)owner;
 
 // 获得 view 的 快照
 -(UIImage*)snapshoot;
@@ -102,6 +106,7 @@
 @end
 
 @interface UITableViewCell (CDZTableViewCellExtension)
+// 从tableView的回收cell里，取出一个 reuseIdentifier为cell类名一个cell
 +(instancetype)reusableCellFromTable:(UITableView*)tableView;
 -(CGPoint)pointAtTableView;
 -(UITableView*)tableView;
