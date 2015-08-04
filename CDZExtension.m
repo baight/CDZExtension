@@ -190,7 +190,8 @@
     [self addTopLine:color edgeInsets:UIEdgeInsetsMake(0, 0, 0, 0)];
 }
 - (void)addTopLine:(UIColor *)color edgeInsets:(UIEdgeInsets)insets{
-    UIView* v = [[UIView alloc]initWithFrame:CGRectMake(insets.left, -0.5 + insets.top, self.width-insets.left - insets.right, 0.5)];
+    CGFloat lineWidth = 1/[UIScreen mainScreen].scale;
+    UIView* v = [[UIView alloc]initWithFrame:CGRectMake(insets.left, -lineWidth + insets.top, self.width-insets.left - insets.right, lineWidth)];
     v.autoresizingMask = UIViewAutoresizingFlexibleWidth;
     v.backgroundColor = color;
     [self addSubview:v];
@@ -199,7 +200,8 @@
     [self addBottomLine:color edgeInsets:UIEdgeInsetsMake(0, 0, 0, 0)];
 }
 -(void)addBottomLine:(UIColor*)color edgeInsets:(UIEdgeInsets)insets;{
-    UIView* v = [[UIView alloc]initWithFrame:CGRectMake(insets.left, self.height-0.5 - insets.bottom, self.width - insets.left - insets.right, 0.5)];
+    CGFloat lineWidth = 1/[UIScreen mainScreen].scale;
+    UIView* v = [[UIView alloc]initWithFrame:CGRectMake(insets.left, self.height-lineWidth - insets.bottom, self.width - insets.left - insets.right, lineWidth)];
     v.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleWidth;
     v.backgroundColor = color;
     [self addSubview:v];
@@ -208,7 +210,8 @@
     [self addLeftLine:color edgeInsets:UIEdgeInsetsMake(0, 0, 0, 0)];
 }
 -(void)addLeftLine:(UIColor*)color edgeInsets:(UIEdgeInsets)insets{
-    UIView* v = [[UIView alloc]initWithFrame:CGRectMake(insets.left, insets.top, 0.5, self.height - insets.top - insets.bottom)];
+    CGFloat lineWidth = 1/[UIScreen mainScreen].scale;
+    UIView* v = [[UIView alloc]initWithFrame:CGRectMake(insets.left, insets.top, lineWidth, self.height - insets.top - insets.bottom)];
     v.autoresizingMask = UIViewAutoresizingFlexibleHeight;
     v.backgroundColor = color;
     [self addSubview:v];
@@ -217,7 +220,8 @@
     [self addRightLine:color edgeInsets:UIEdgeInsetsMake(0, 0, 0, 0)];
 }
 -(void)addRightLine:(UIColor*)color edgeInsets:(UIEdgeInsets)insets{
-    UIView* v = [[UIView alloc]initWithFrame:CGRectMake(self.width - 0.5 - insets.right, insets.top, 0.5, self.height - insets.top - insets.bottom)];
+    CGFloat lineWidth = 1/[UIScreen mainScreen].scale;
+    UIView* v = [[UIView alloc]initWithFrame:CGRectMake(self.width - lineWidth - insets.right, insets.top, lineWidth, self.height - insets.top - insets.bottom)];
     v.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleHeight;
     v.backgroundColor = color;
     [self addSubview:v];
