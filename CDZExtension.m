@@ -359,6 +359,9 @@
 
 @implementation UINavigationBar (CDZNavigationBarExtension)
 -(void)setTitleColor:(UIColor *)titleColor{
+    if(titleColor == nil){
+        return;
+    }
     NSMutableDictionary* dic;
     if(self.titleTextAttributes == nil){
         dic = [[NSMutableDictionary alloc]init];
@@ -723,6 +726,14 @@ static void releaseAssetCallback(void *info){
 @implementation NSData (CDZDataExtension)
 -(NSString*)stringWithEncoding:(NSStringEncoding)encoding{
     return [[NSString alloc]initWithData:self encoding:encoding];
+}
+-(NSString*)stringValue{
+    NSString* string = [[NSString alloc]initWithData:self encoding:NSUTF8StringEncoding];
+    if(string.length == 0){
+        NSStringEncoding enc = CFStringConvertEncodingToNSStringEncoding (kCFStringEncodingGB_18030_2000);
+        string = [[NSString alloc] initWithData:self encoding:enc];
+    }
+    return string;
 }
 @end
 

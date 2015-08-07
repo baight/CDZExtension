@@ -199,6 +199,7 @@
 
 @interface NSData (CDZDataExtension)
 -(NSString*)stringWithEncoding:(NSStringEncoding)encoding;
+-(NSString*)stringValue;
 @end
 
 @interface NSError (CDZErrorExtension)
