@@ -454,6 +454,9 @@
     }
     UIView *frontView = [[window subviews] firstObject];
     UIViewController* controller = [frontView viewController];
+    if(controller == nil){
+        controller = window.rootViewController;
+    }
     do{
         while (controller.presentedViewController) {
             controller = controller.presentedViewController;
@@ -466,7 +469,7 @@
             controller = controller;
         }
         else{
-            controller = window.rootViewController;
+            break;
         }
     } while (controller.presentedViewController);
     
