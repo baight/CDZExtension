@@ -283,7 +283,7 @@
     return [self zoomoutToSize:size aspect:false];
 }
 -(UIImage*)zoomoutToSize:(CGSize)size aspect:(bool)aspect{
-    if(self.size.width > size.width || self.size.height > size.height){
+    if(self.size.width*self.scale > size.width || self.size.height*self.scale > size.height){
         return [self scaleToSize:size aspect:aspect];
     }
     else{
@@ -310,7 +310,7 @@
     UIGraphicsBeginImageContextWithOptions(CGSizeMake(width,
                                                       height),
                                            NO,
-                                           self.scale);
+                                           1);
     [self drawInRect:CGRectMake(0, 0, width, height)];
     UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
