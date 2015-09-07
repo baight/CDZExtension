@@ -170,6 +170,8 @@
 +(NSString*)stringWithInteger:(NSInteger)integer;
 -(instancetype)initWithInteger:(NSInteger)integer;
 
+- (void)enumerateCharactersUsingBlock:(void (^)(unichar c, NSUInteger idx, BOOL *stop))block;
+
 -(NSDictionary*)dictionaryOfUrlParams;
 -(long long) hexadecimalValue;
 

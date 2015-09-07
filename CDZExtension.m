@@ -546,6 +546,19 @@
 -(instancetype)initWithInteger:(NSInteger)integer{
     return [self initWithFormat:@"%zd", integer, nil];
 }
+- (void)enumerateCharactersUsingBlock:(void (^)(unichar c, NSUInteger idx, BOOL *stop))block{
+    if(block == nil){
+        return;
+    }
+    BOOL stop = NO;
+    for(NSInteger index = 0; index < self.length; index++){
+        unichar c = [self characterAtIndex:index];
+        block(c, index, &stop);
+        if(stop){
+            break;
+        }
+    }
+}
 -(NSDictionary*)dictionaryOfUrlParams{
     NSString* params = self;
     NSRange range = [self rangeOfString:@"?"];
