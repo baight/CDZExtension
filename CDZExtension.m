@@ -20,20 +20,20 @@
     return obj;
 }
 
--(void)setX:(CGFloat)x{
+- (void)setX:(CGFloat)x{
     CGRect rect = self.frame;
     rect.origin.x = x;
     self.frame = rect;
 }
--(CGFloat)x{
+- (CGFloat)x{
     return self.frame.origin.x;
 }
--(void)setY:(CGFloat)y{
+- (void)setY:(CGFloat)y{
     CGRect rect = self.frame;
     rect.origin.y = y;
     self.frame = rect;
 }
--(CGFloat)y{
+- (CGFloat)y{
     return self.frame.origin.y;
 }
 - (CGFloat)right{
@@ -54,28 +54,28 @@
 }
 
 
--(void)setWidth:(CGFloat)width{
+- (void)setWidth:(CGFloat)width{
     CGRect rect = self.frame;
     rect.size.width = width;
     self.frame = rect;
 }
--(CGFloat)width{
+- (CGFloat)width{
     return self.frame.size.width;
 }
--(void)setHeight:(CGFloat)height{
+- (void)setHeight:(CGFloat)height{
     CGRect rect = self.frame;
     rect.size.height = height;
     self.frame = rect;
 }
--(CGFloat)height{
+- (CGFloat)height{
     return self.frame.size.height;
 }
--(void)setSize:(CGSize)size{
+- (void)setSize:(CGSize)size{
     CGRect rect = self.frame;
     rect.size = size;
     self.frame = rect;
 }
--(CGSize)size{
+- (CGSize)size{
     return self.frame.size;
 }
 
@@ -92,29 +92,34 @@
     self.center = CGPointMake(self.center.x, centerY);
 }
 
--(void)setCornerRadius:(CGFloat)cornerRadius{
+- (void)setCornerRadius:(CGFloat)cornerRadius{
     self.layer.cornerRadius = cornerRadius;
     self.layer.masksToBounds = YES;
 }
--(CGFloat)cornerRadius{
+- (CGFloat)cornerRadius{
     return self.layer.cornerRadius;
 }
--(void)setBorderColor:(UIColor *)borderColor{
+- (void)setBorderColor:(UIColor *)borderColor{
     self.layer.borderColor = borderColor.CGColor;
     self.layer.masksToBounds = YES;
 }
--(UIColor*)borderColor{
+- (UIColor*)borderColor{
     return [UIColor colorWithCGColor:self.layer.borderColor];
 }
--(void)setBorderWidth:(CGFloat)borderWidth{
+- (void)setBorderWidth:(CGFloat)borderWidth{
     self.layer.borderWidth = borderWidth;
     self.layer.masksToBounds = YES;
 }
--(CGFloat)borderWidth{
+- (CGFloat)borderWidth{
     return self.layer.borderWidth;
 }
+- (void)setBorderColor:(UIColor*)borderColor width:(CGFloat)width{
+    self.layer.borderColor = borderColor.CGColor;
+    self.layer.borderWidth = width;
+    self.layer.masksToBounds = YES;
+}
 
--(UIImage*)snapshoot{
+- (UIImage*)snapshoot{
     UIGraphicsBeginImageContextWithOptions(CGSizeMake(self.bounds.size.width,self.bounds.size.height), self.opaque, [UIScreen mainScreen].scale);
     CGContextRef context = UIGraphicsGetCurrentContext();
     if([self isKindOfClass:[UIScrollView class]]){
@@ -127,12 +132,12 @@
     return image;
 }
 
--(void)removeAllSubviews{
+- (void)removeAllSubviews{
     for(UIView* v in self.subviews){
         [v removeFromSuperview];
     }
 }
--(UIView*)viewWithClass:(Class)c;{
+- (UIView*)viewWithClass:(Class)c;{
     for(UIView* v in self.subviews){
         if( [v isMemberOfClass:c]){
             return v;
@@ -141,7 +146,7 @@
     return nil;
 }
 
--(void)moveToRightOfView:(UIView *)view interval:(CGFloat)interval{
+- (void)moveToRightOfView:(UIView *)view interval:(CGFloat)interval{
     CGSize size = view.bounds.size;
     if([view isKindOfClass:[UILabel class]]){
         UILabel* label = (UILabel*)view;
@@ -169,7 +174,7 @@
     self.frame = rect;
 }
 
--(void)moveToBottomnOfView:(UIView*)view interval:(CGFloat)interval{
+- (void)moveToBottomnOfView:(UIView*)view interval:(CGFloat)interval{
     CGRect rect = self.frame;
     rect.origin.y = view.frame.origin.y + view.bounds.size.height + interval;
     self.frame = rect;
@@ -186,7 +191,7 @@
     return nil;
 }
 
--(void)addTopLine:(UIColor*)color{
+- (void)addTopLine:(UIColor*)color{
     [self addTopLine:color edgeInsets:UIEdgeInsetsMake(0, 0, 0, 0)];
 }
 - (void)addTopLine:(UIColor *)color edgeInsets:(UIEdgeInsets)insets{
@@ -196,30 +201,30 @@
     v.backgroundColor = color;
     [self addSubview:v];
 }
--(void)addBottomLine:(UIColor*)color{
+- (void)addBottomLine:(UIColor*)color{
     [self addBottomLine:color edgeInsets:UIEdgeInsetsMake(0, 0, 0, 0)];
 }
--(void)addBottomLine:(UIColor*)color edgeInsets:(UIEdgeInsets)insets;{
+- (void)addBottomLine:(UIColor*)color edgeInsets:(UIEdgeInsets)insets;{
     CGFloat lineWidth = 1/[UIScreen mainScreen].scale;
     UIView* v = [[UIView alloc]initWithFrame:CGRectMake(insets.left, self.height-lineWidth - insets.bottom, self.width - insets.left - insets.right, lineWidth)];
     v.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleWidth;
     v.backgroundColor = color;
     [self addSubview:v];
 }
--(void)addLeftLine:(UIColor*)color{
+- (void)addLeftLine:(UIColor*)color{
     [self addLeftLine:color edgeInsets:UIEdgeInsetsMake(0, 0, 0, 0)];
 }
--(void)addLeftLine:(UIColor*)color edgeInsets:(UIEdgeInsets)insets{
+- (void)addLeftLine:(UIColor*)color edgeInsets:(UIEdgeInsets)insets{
     CGFloat lineWidth = 1/[UIScreen mainScreen].scale;
     UIView* v = [[UIView alloc]initWithFrame:CGRectMake(insets.left, insets.top, lineWidth, self.height - insets.top - insets.bottom)];
     v.autoresizingMask = UIViewAutoresizingFlexibleHeight;
     v.backgroundColor = color;
     [self addSubview:v];
 }
--(void)addRightLine:(UIColor*)color{
+- (void)addRightLine:(UIColor*)color{
     [self addRightLine:color edgeInsets:UIEdgeInsetsMake(0, 0, 0, 0)];
 }
--(void)addRightLine:(UIColor*)color edgeInsets:(UIEdgeInsets)insets{
+- (void)addRightLine:(UIColor*)color edgeInsets:(UIEdgeInsets)insets{
     CGFloat lineWidth = 1/[UIScreen mainScreen].scale;
     UIView* v = [[UIView alloc]initWithFrame:CGRectMake(self.width - lineWidth - insets.right, insets.top, lineWidth, self.height - insets.top - insets.bottom)];
     v.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleHeight;
@@ -230,30 +235,30 @@
 @end
 
 @implementation UIScrollView (CDZScrollViewExtension)
--(CGFloat)contentWidth{
+- (CGFloat)contentWidth{
     return self.contentSize.width;
 }
--(void)setContentWidth:(CGFloat)contentWidth{
+- (void)setContentWidth:(CGFloat)contentWidth{
     CGSize size = self.contentSize;
     size.width= contentWidth;
     self.contentSize = size;
 }
--(CGFloat)contentHeight{
+- (CGFloat)contentHeight{
     return self.contentSize.height;
 }
--(void)setContentHeight:(CGFloat)contentHeight{
+- (void)setContentHeight:(CGFloat)contentHeight{
     CGSize size = self.contentSize;
     size.height = contentHeight;
     self.contentSize = size;
 }
--(NSInteger)totalPage{
+- (NSInteger)totalPage{
     NSInteger page = self.contentSize.width / self.bounds.size.width;
     if(self.contentSize.width - page*self.bounds.size.width > 10){
         page++;
     }
     return page;
 }
--(NSInteger)currentPage{
+- (NSInteger)currentPage{
     NSInteger page = self.contentOffset.x / self.bounds.size.width;
     if(self.contentOffset.x - page*self.bounds.size.width > self.bounds.size.width/2){
         page++;
@@ -263,7 +268,7 @@
 @end
 
 @implementation UILabel(CDZLabelExtension)
--(CGSize)textSize{
+- (CGSize)textSize{
     return [self.text sizeWithFont:self.font];
 }
 @end
@@ -276,13 +281,41 @@
     CGContextFillRect(context, CGRectMake(0, 0, 1, 1));
     UIImage* image = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
-    return [image stretchableImageWithLeftCapWidth:0 topCapHeight:0];
+    return image;
+}
++(UIImage*)roundImageOfColor:(UIColor*)color radius:(CGFloat)radius{
+    return [self roundImageOfColor:color borderColor:nil borderWidth:0 radius:radius scale:[UIScreen mainScreen].scale];
+}
++(UIImage*)roundImageOfColor:(UIColor*)color borderColor:(UIColor*)borderColor borderWidth:(CGFloat)borderWidth radius:(CGFloat)radius scale:(CGFloat)scale{
+    CGFloat diameter = radius*2;
+    CGFloat size = diameter + borderWidth;
+    CGFloat halfBorderWidth = borderWidth/2;
+    
+    UIGraphicsBeginImageContextWithOptions(CGSizeMake(size, size), NO, scale);
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    CGContextSetLineWidth(context, borderWidth);
+    CGContextSetFillColorWithColor(context, color.CGColor);
+    CGContextSetStrokeColorWithColor(context, borderColor.CGColor);
+    CGContextAddEllipseInRect(context, CGRectMake(halfBorderWidth, halfBorderWidth, diameter, diameter));
+    if(borderColor && borderWidth > 0){
+        CGContextDrawPath(context, kCGPathFillStroke);
+    }
+    else{
+        CGContextDrawPath(context, kCGPathFill);
+    }
+    UIImage* image = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return image;
 }
 
--(UIImage*)zoomoutToSize:(CGSize)size{
+- (UIImage*)stretchableImage{
+    return [self stretchableImageWithLeftCapWidth:self.size.width/2 topCapHeight:self.size.height/2];
+}
+
+- (UIImage*)zoomoutToSize:(CGSize)size{
     return [self zoomoutToSize:size aspect:false];
 }
--(UIImage*)zoomoutToSize:(CGSize)size aspect:(bool)aspect{
+- (UIImage*)zoomoutToSize:(CGSize)size aspect:(bool)aspect{
     if(self.size.width*self.scale > size.width || self.size.height*self.scale > size.height){
         return [self scaleToSize:size aspect:aspect];
     }
@@ -290,10 +323,10 @@
         return self;
     }
 }
--(UIImage*)scaleToSize:(CGSize)size{
+- (UIImage*)scaleToSize:(CGSize)size{
     return [self scaleToSize:size aspect:false];
 }
--(UIImage*)scaleToSize:(CGSize)size aspect:(bool)aspect{
+- (UIImage*)scaleToSize:(CGSize)size aspect:(bool)aspect{
     int width = size.width, height = size.height;
     if(aspect){
         // 先假设以宽为基准
@@ -323,15 +356,15 @@
 @implementation CDZClearFooterView
 @end
 @implementation UITableView (CDZTableViewExtension)
--(void)setClearTableFooterView{
+- (void)setClearTableFooterView{
     self.tableFooterView = [[CDZClearFooterView alloc]init];
     self.tableFooterView.backgroundColor = [UIColor clearColor];
 }
--(void)setClearTableFooterViewWidthHeight:(CGFloat)height{
+- (void)setClearTableFooterViewWidthHeight:(CGFloat)height{
     self.tableFooterView = [[CDZClearFooterView alloc]initWithFrame:CGRectMake(0, 0, 1, height)];
     self.tableFooterView.backgroundColor = [UIColor clearColor];
 }
--(BOOL)isClearFooterView{
+- (BOOL)isClearFooterView{
     return [self.tableFooterView isKindOfClass:[CDZClearFooterView class]];
 }
 @end
@@ -340,12 +373,12 @@
 +(instancetype)reusableCellFromTable:(UITableView*)tableView{
     return [tableView dequeueReusableCellWithIdentifier:NSStringFromClass([self class])];
 }
--(CGPoint)pointAtTableView{
+- (CGPoint)pointAtTableView{
     UITableView* tableView = [self tableView];
     CGPoint point = [self convertPoint:CGPointMake(0, 0) toView:tableView];
     return point;
 }
--(UITableView*)tableView{
+- (UITableView*)tableView{
     UIView* tableView = self.superview;
     while (tableView != nil) {
         if([tableView isKindOfClass:[UITableView class]]){
@@ -358,7 +391,7 @@
 @end
 
 @implementation UINavigationBar (CDZNavigationBarExtension)
--(void)setTitleColor:(UIColor *)titleColor{
+- (void)setTitleColor:(UIColor *)titleColor{
     if(titleColor == nil){
         return;
     }
@@ -371,16 +404,16 @@
     [dic setObject:titleColor forKey:NSForegroundColorAttributeName];
     self.titleTextAttributes = dic;
 }
--(UIColor*)titleColor{
+- (UIColor*)titleColor{
     return self.titleTextAttributes[NSForegroundColorAttributeName];
 }
 @end
 
 @implementation UIScreen (CDZScreenExtension)
--(CGFloat)width{
+- (CGFloat)width{
     return self.bounds.size.width;
 }
--(CGFloat)height{
+- (CGFloat)height{
     return self.bounds.size.height;
 }
 @end
@@ -395,17 +428,17 @@
     float blue = ((float)(hexColor & 0xFF))/255.0;
     return [UIColor colorWithRed:red green:green blue:blue alpha:opacity];
 }
--(UIColor*)lightColor{
+- (UIColor*)lightColor{
     CGFloat r, g, b, a;
     [self getRed:&r green:&g blue:&b alpha:&a];
     return [UIColor colorWithRed:(1+r)/2 green:(1+g)/2 blue:(1+b)/2 alpha:a];
 }
--(UIColor*)darkColor{
+- (UIColor*)darkColor{
     CGFloat r, g, b, a;
     [self getRed:&r green:&g blue:&b alpha:&a];
     return [UIColor colorWithRed:r/2 green:g/2 blue:b/2 alpha:a];
 }
--(UIColor*)disableColor{
+- (UIColor*)disableColor{
     CGFloat r, g, b, a;
     [self getRed:&r green:&g blue:&b alpha:&a];
     CGFloat va = (r + g + b) / 3;
@@ -424,18 +457,27 @@
     __autoreleasing UIViewController* c = [[self alloc] initWithNibName:NSStringFromClass(self) bundle:nil];
     return c;
 }
--(BOOL)isVisible{
+- (BOOL)isVisible{
     return (self.isViewLoaded && self.view.window != nil);
 }
 @end
 
 @implementation UINavigationController (CDZNavigationControllerExtension)
--(void)popToViewControllerAtIndex:(NSInteger)index animated:(BOOL)animated{
+- (void)popToViewControllerAtIndex:(NSInteger)index animated:(BOOL)animated{
     if(index >= self.viewControllers.count){
         return;
     }
     UIViewController* c = [self.viewControllers objectAtIndex:index];
     [self popToViewController:c animated:animated];
+}
+- (void)popControllersCount:(NSInteger)count animated:(BOOL)animated{
+    if(count + 1 > self.viewControllers.count){
+        [self popToRootViewControllerAnimated:animated];
+    }
+    else{
+        UIViewController* c = [self.viewControllers objectAtIndex:self.viewControllers.count-1-count];
+        [self popToViewController:c animated:YES];
+    }
 }
 
 @end
@@ -457,6 +499,7 @@
     if(controller == nil){
         controller = window.rootViewController;
     }
+    
     do{
         while (controller.presentedViewController) {
             controller = controller.presentedViewController;
@@ -491,7 +534,7 @@
 
 #pragma mark - SBJson
 @implementation NSString (SBJson)
--(id)JSONValue{
+- (id)JSONValue{
     NSData* data = [self dataUsingEncoding:NSUTF8StringEncoding];
     __autoreleasing NSError* error = nil;
     id result = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:&error];
@@ -501,7 +544,7 @@
 @end
 
 @implementation NSArray (SBJson)
--(NSString*)JSONRepresentation{
+- (NSString*)JSONRepresentation{
     NSError* error = nil;
     NSData* data = [NSJSONSerialization dataWithJSONObject:self options:kNilOptions error:&error];
     if (error != nil) return nil;
@@ -512,7 +555,7 @@
 @end
 
 @implementation NSDictionary (SBJson)
--(NSString*)JSONRepresentation{
+- (NSString*)JSONRepresentation{
     NSError* error = nil;
     NSData* data = [NSJSONSerialization dataWithJSONObject:self options:kNilOptions error:&error];
     if (error != nil) return nil;
@@ -543,7 +586,7 @@
 +(NSString*)stringWithInteger:(NSInteger)integer{
     return [NSString stringWithFormat:@"%zd", integer, nil];
 }
--(instancetype)initWithInteger:(NSInteger)integer{
+- (instancetype)initWithInteger:(NSInteger)integer{
     return [self initWithFormat:@"%zd", integer, nil];
 }
 - (void)enumerateCharactersUsingBlock:(void (^)(unichar c, NSUInteger idx, BOOL *stop))block{
@@ -559,7 +602,7 @@
         }
     }
 }
--(NSDictionary*)dictionaryOfUrlParams{
+- (NSDictionary*)dictionaryOfUrlParams{
     NSString* params = self;
     NSRange range = [self rangeOfString:@"?"];
     if(range.location != NSNotFound && range.location != self.length-1){
@@ -580,7 +623,7 @@
     }
     return d;
 }
--(long long) hexadecimalValue{
+- (long long) hexadecimalValue{
     if(self.length == 0){
         return 0;
     }
@@ -605,7 +648,7 @@
     return ans;
 }
 
--(NSMutableAttributedString*)attributedStringWithAttribute:(NSString*)attribute value:(id)value range:(NSRange)range{
+- (NSMutableAttributedString*)attributedStringWithAttribute:(NSString*)attribute value:(id)value range:(NSRange)range{
     NSMutableAttributedString* mas = [[NSMutableAttributedString alloc]initWithString:self];
     [mas addAttribute:attribute value:value range:range];
     return mas;
@@ -613,7 +656,7 @@
 @end
 
 @implementation  NSMutableArray (CDZArrayExtension)
--(void)removeFirstObject{
+- (void)removeFirstObject{
     if(self.count > 0){
         [self removeObjectAtIndex:0];
     }
@@ -621,24 +664,24 @@
 @end
 
 @implementation ALAsset (CDZAssetExtension)
--(UIImage*)image{
+- (UIImage*)image{
     ALAssetRepresentation *assetRep = [self defaultRepresentation];
     CGImageRef imgRef = [assetRep fullResolutionImage];
     UIImage *img = [UIImage imageWithCGImage:imgRef scale:assetRep.scale orientation:UIImageOrientationUp];
     return img;
 }
--(UIImage*)imageOfFullScreen{
+- (UIImage*)imageOfFullScreen{
     ALAssetRepresentation *assetRep = [self defaultRepresentation];
     CGImageRef imgRef = [assetRep fullScreenImage];
     UIImage *img = [UIImage imageWithCGImage:imgRef scale:assetRep.scale orientation:UIImageOrientationUp];
     return img;
 }
--(UIImage*)imageOfThumbnail{
+- (UIImage*)imageOfThumbnail{
     CGImageRef  ref = [self thumbnail];
     UIImage *img = [UIImage imageWithCGImage:ref];
     return img;
 }
--(UIImage*)imageWithMaxSize:(CGSize)size{
+- (UIImage*)imageWithMaxSize:(CGSize)size{
     ALAssetRepresentation *assetRep = [self defaultRepresentation];
     CGSize mySize = [assetRep dimensions];
     
@@ -716,7 +759,7 @@ static void releaseAssetCallback(void *info){
 @end
 
 @implementation NSDictionary (CDZDictionaryExtension)
--(id)objectExceptNullForKey:(id)aKey{
+- (id)objectExceptNullForKey:(id)aKey{
     id object = [self objectForKey:aKey];
     if([object isKindOfClass:[NSNull class]]){
         return nil;
@@ -732,7 +775,7 @@ static void releaseAssetCallback(void *info){
     NSDate* date = [[NSDate alloc]initWithTimeIntervalSince1970:timeInterval];
     return [date stringWithFormat:formate];
 }
--(NSString*)stringWithFormat:(NSString*)formate{
+- (NSString*)stringWithFormat:(NSString*)formate{
     NSDateFormatter* formatter = [[NSDateFormatter alloc]init];
     [formatter setDateFormat:formate];
     return [formatter stringFromDate:self];
@@ -740,10 +783,10 @@ static void releaseAssetCallback(void *info){
 @end
 
 @implementation NSData (CDZDataExtension)
--(NSString*)stringWithEncoding:(NSStringEncoding)encoding{
+- (NSString*)stringWithEncoding:(NSStringEncoding)encoding{
     return [[NSString alloc]initWithData:self encoding:encoding];
 }
--(NSString*)stringValue{
+- (NSString*)stringValue{
     NSString* string = [[NSString alloc]initWithData:self encoding:NSUTF8StringEncoding];
     if(string.length == 0){
         NSStringEncoding enc = CFStringConvertEncodingToNSStringEncoding (kCFStringEncodingGB_18030_2000);
@@ -754,7 +797,7 @@ static void releaseAssetCallback(void *info){
 @end
 
 @implementation NSError (CDZErrorExtension)
--(NSString*)errorMessage{
+- (NSString*)errorMessage{
     return [NSString stringWithFormat:@"Error Code: %zd\nDomain: %@\nDescription: %@\nReason: %@",
             self.code,
             self.domain,
