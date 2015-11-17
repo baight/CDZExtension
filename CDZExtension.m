@@ -11,7 +11,7 @@
 
 #pragma mark - UIView
 @implementation UIView (CDZViewExtension)
-+(id)loadFromBundleWithOwner:(id)owner{
++ (id)loadFromBundleWithOwner:(id)owner{
     NSString* className = NSStringFromClass([self class]);
     id obj = [[[NSBundle mainBundle] loadNibNamed:className owner:owner options:nil] firstObject];
     if([obj isKindOfClass:[UITableViewCell class]]){
@@ -274,7 +274,7 @@
 @end
 
 @implementation UIImage (CDZImageExtension)
-+(UIImage*)imageOfColor:(UIColor*)color{
++ (UIImage*)imageOfColor:(UIColor*)color{
     UIGraphicsBeginImageContext(CGSizeMake(1, 1));
     CGContextRef context = UIGraphicsGetCurrentContext();
     CGContextSetFillColorWithColor(context, color.CGColor);
@@ -283,10 +283,10 @@
     UIGraphicsEndImageContext();
     return image;
 }
-+(UIImage*)roundImageOfColor:(UIColor*)color radius:(CGFloat)radius{
++ (UIImage*)roundImageOfColor:(UIColor*)color radius:(CGFloat)radius{
     return [self roundImageOfColor:color borderColor:nil borderWidth:0 radius:radius scale:[UIScreen mainScreen].scale];
 }
-+(UIImage*)roundImageOfColor:(UIColor*)color borderColor:(UIColor*)borderColor borderWidth:(CGFloat)borderWidth radius:(CGFloat)radius scale:(CGFloat)scale{
++ (UIImage*)roundImageOfColor:(UIColor*)color borderColor:(UIColor*)borderColor borderWidth:(CGFloat)borderWidth radius:(CGFloat)radius scale:(CGFloat)scale{
     CGFloat diameter = radius*2;
     CGFloat size = diameter + borderWidth;
     CGFloat halfBorderWidth = borderWidth/2;
@@ -370,7 +370,7 @@
 @end
 
 @implementation UITableViewCell (CDZTableViewCellExtension)
-+(instancetype)reusableCellFromTable:(UITableView*)tableView{
++ (instancetype)reusableCellFromTable:(UITableView*)tableView{
     return [tableView dequeueReusableCellWithIdentifier:NSStringFromClass([self class])];
 }
 - (CGPoint)pointAtTableView{
@@ -446,14 +446,14 @@
         return [UIColor colorWithRed:(va+r)/2/2 green:(va+g)/2/2 blue:(va+b)/2/2 alpha:a];
     }
     else{
-        return [UIColor colorWithRed:(1+(va+r)/2)/2 green:(1+(va+g)/2)/2 blue:(1+(va+b)/2)/2 alpha:a];
+        return [UIColor colorWithRed:(1+ (va+r)/2)/2 green:(1+ (va+g)/2)/2 blue:(1+ (va+b)/2)/2 alpha:a];
     }
 }
 @end
 
 #pragma mark - UIViewController
 @implementation UIViewController(CDZControllerExtension)
-+(id)loadFromNib{
++ (id)loadFromNib{
     __autoreleasing UIViewController* c = [[self alloc] initWithNibName:NSStringFromClass(self) bundle:nil];
     return c;
 }
@@ -568,22 +568,22 @@
 #pragma mark - NSObject
 
 @implementation NSObject (CDZObjectExtension)
-+(NSString*)classString{
++ (NSString*)classString{
     return NSStringFromClass([self class]);
 }
 @end
 
 @implementation NSString (CDZStringExtension)
-+(NSString*)documentDirectoryPath{
++ (NSString*)documentDirectoryPath{
     return [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) firstObject];
 }
-+(NSString*)cacheDirectoryPath{
++ (NSString*)cacheDirectoryPath{
     return [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) firstObject];
 }
-+(NSString*)temporaryDirectoryPath{
++ (NSString*)temporaryDirectoryPath{
     return NSTemporaryDirectory();
 }
-+(NSString*)stringWithInteger:(NSInteger)integer{
++ (NSString*)stringWithInteger:(NSInteger)integer{
     return [NSString stringWithFormat:@"%zd", integer, nil];
 }
 - (instancetype)initWithInteger:(NSInteger)integer{
@@ -601,6 +601,26 @@
             break;
         }
     }
+}
+
+- (NSString*)urlStringWithParamsDictionary:(NSDictionary*)dic{
+    if(dic.count == 0){
+        return [self copy];
+    }
+    NSMutableString* urlString = [[NSMutableString alloc]initWithString:self];
+    NSRange range = [urlString rangeOfString:@"?"];
+    if(range.location == NSNotFound){
+        [urlString appendString:@"?"];
+    }
+    else if(![urlString hasSuffix:@"&"]){
+        [urlString appendString:@"&"];
+    }
+    for(NSString* key in dic){
+        NSString* value = dic[key];
+        [urlString appendFormat:@"%@=%@&", key, value];
+    }
+    [urlString deleteCharactersInRange:NSMakeRange(urlString.length-1, 1)];
+    return urlString;
 }
 - (NSDictionary*)dictionaryOfUrlParams{
     NSString* params = self;
@@ -771,7 +791,7 @@ static void releaseAssetCallback(void *info){
 @end
 
 @implementation NSDate (CDZDateExtension)
-+(NSString*)stringFromTimeIntervalSince1970:(NSTimeInterval)timeInterval formate:(NSString*)formate{
++ (NSString*)stringFromTimeIntervalSince1970:(NSTimeInterval)timeInterval formate:(NSString*)formate{
     NSDate* date = [[NSDate alloc]initWithTimeIntervalSince1970:timeInterval];
     return [date stringWithFormat:formate];
 }

@@ -19,8 +19,13 @@
 
 #define GCDAsyncInMain(block)        dispatch_async(dispatch_get_main_queue(), (block))
 #define GCDSyncInMain(block)         dispatch_sync(dispatch_get_main_queue(), (block))
+#define GCDAsyncInMainAfter(time, block) dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC*(time)), dispatch_get_main_queue(), (block))
+
 #define GCDAsyncInBackground(block)  dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), (block))
 #define GCDSyncInBackground(block)   dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), (block))
+#define GCDAsyncInBackgroundAfter(time, block) dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC*(time)), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), (block))
+
+
 
 #define StringNotNil(str) (str ? str : @"")
 
@@ -51,7 +56,7 @@
 // 如果视图是 UITableViewCell或其子类，则自动设置 cell的reuseIdentifier 为类名
 // 如果是cell，建议与 UITableViewCell的扩展方法 reusableCellFromTable: 一起使用
 // reusableCellFromTable: 的作用是：从tableView的回收cell里，取出一个 reuseIdentifier为cell类名一个cell
-+(id)loadFromBundleWithOwner:(id)owner;
++ (id)loadFromBundleWithOwner:(id)owner;
 
 // 获得 view 的 快照
 - (UIImage*)snapshoot;
@@ -95,9 +100,9 @@
 
 @interface UIImage (CDZImageExtension)
 // 得到一张 1*1 的纯色图片
-+(UIImage*)imageOfColor:(UIColor*)color;
-+(UIImage*)roundImageOfColor:(UIColor*)color radius:(CGFloat)radius;
-+(UIImage*)roundImageOfColor:(UIColor*)color borderColor:(UIColor*)borderColor borderWidth:(CGFloat)borderWidth radius:(CGFloat)radius scale:(CGFloat)scale;
++ (UIImage*)imageOfColor:(UIColor*)color;
++ (UIImage*)roundImageOfColor:(UIColor*)color radius:(CGFloat)radius;
++ (UIImage*)roundImageOfColor:(UIColor*)color borderColor:(UIColor*)borderColor borderWidth:(CGFloat)borderWidth radius:(CGFloat)radius scale:(CGFloat)scale;
 
 - (UIImage*)stretchableImage;
 
@@ -117,7 +122,7 @@
 
 @interface UITableViewCell (CDZTableViewCellExtension)
 // 从tableView的回收cell里，取出一个 reuseIdentifier为cell类名一个cell
-+(instancetype)reusableCellFromTable:(UITableView*)tableView;
++ (instancetype)reusableCellFromTable:(UITableView*)tableView;
 - (CGPoint)pointAtTableView;
 - (UITableView*)tableView;
 @end
@@ -132,8 +137,8 @@
 @end
 
 @interface UIColor (CDZColorExtension)
-+(UIColor*)colorWithHexadecimal:(long)hexColor;
-+(UIColor*)colorWithHexadecimal:(long)hexColor alpha:(float)opacity;
++ (UIColor*)colorWithHexadecimal:(long)hexColor;
++ (UIColor*)colorWithHexadecimal:(long)hexColor alpha:(float)opacity;
 - (UIColor*)lightColor;
 - (UIColor*)darkColor;
 - (UIColor*)disableColor;
@@ -141,7 +146,7 @@
 
 #pragma mark - UIViewController
 @interface UIViewController(CDZControllerExtension)
-+(id)loadFromNib;
++ (id)loadFromNib;
 - (BOOL)isVisible;
 @end
 
@@ -170,19 +175,20 @@
 
 #pragma mark - NSObject
 @interface NSObject (CDZObjectExtension)
-+(NSString*)classString;
++ (NSString*)classString;
 @end
 
 @interface NSString (CDZStringExtension)
-+(NSString*)documentDirectoryPath;
-+(NSString*)cacheDirectoryPath;
-+(NSString*)temporaryDirectoryPath;
++ (NSString*)documentDirectoryPath;
++ (NSString*)cacheDirectoryPath;
++ (NSString*)temporaryDirectoryPath;
 
-+(NSString*)stringWithInteger:(NSInteger)integer;
++ (NSString*)stringWithInteger:(NSInteger)integer;
 - (instancetype)initWithInteger:(NSInteger)integer;
 
 - (void)enumerateCharactersUsingBlock:(void (^)(unichar c, NSUInteger idx, BOOL *stop))block;
 
+- (NSString*)urlStringWithParamsDictionary:(NSDictionary*)dic;
 - (NSDictionary*)dictionaryOfUrlParams;
 - (long long) hexadecimalValue;
 
@@ -206,7 +212,7 @@
 @end
 
 @interface NSDate (CDZDateExtension)
-+(NSString*)stringFromTimeIntervalSince1970:(NSTimeInterval)timeInterval formate:(NSString*)formate;
++ (NSString*)stringFromTimeIntervalSince1970:(NSTimeInterval)timeInterval formate:(NSString*)formate;
 - (NSString*)stringWithFormat:(NSString*)formate;
 @end
 
