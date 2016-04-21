@@ -311,6 +311,22 @@
 - (UIImage*)stretchableImage{
     return [self stretchableImageWithLeftCapWidth:self.size.width/2 topCapHeight:self.size.height/2];
 }
+- (UIImage*)imageWithTintColor:(UIColor*)color{
+    UIGraphicsBeginImageContextWithOptions(self.size, NO, self.scale);
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    
+    CGContextTranslateCTM(context, 0, self.size.height);
+    CGContextScaleCTM(context, 1.0, -1.0);
+    CGContextSetBlendMode(context, kCGBlendModeNormal);
+    
+    CGRect rect = CGRectMake(0, 0, self.size.width, self.size.height);
+    CGContextClipToMask(context, rect, self.CGImage);
+    CGContextSetFillColorWithColor(context, color.CGColor);
+    CGContextFillRect(context, rect);
+    UIImage*newImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return newImage;
+}
 
 - (UIImage*)zoomoutToSize:(CGSize)size{
     return [self zoomoutToSize:size aspect:false];
@@ -342,8 +358,8 @@
     
     UIGraphicsBeginImageContextWithOptions(CGSizeMake(width,
                                                       height),
-                                           NO,
-                                           1);
+                                           YES,
+                                           0);
     [self drawInRect:CGRectMake(0, 0, width, height)];
     UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
@@ -449,6 +465,13 @@
         return [UIColor colorWithRed:(1+ (va+r)/2)/2 green:(1+ (va+g)/2)/2 blue:(1+ (va+b)/2)/2 alpha:a];
     }
 }
+- (BOOL)isEqualToColor:(UIColor*)color{
+    CGFloat redValue, greenValue, blueValue, alphaValue;
+    CGFloat myRedValue, myGreenValue, myBlueValue, myAlphaValue;
+    [color getRed:&redValue green:&greenValue blue:&blueValue alpha:&alphaValue];
+    [self getRed:&myRedValue green:&myGreenValue blue:&myBlueValue alpha:&myAlphaValue];
+    return (redValue == myRedValue && greenValue == myGreenValue && blueValue == myBlueValue && alphaValue == myAlphaValue);
+}
 @end
 
 #pragma mark - UIViewController
@@ -464,17 +487,35 @@
 
 @implementation UINavigationController (CDZNavigationControllerExtension)
 - (void)popToViewControllerAtIndex:(NSInteger)index animated:(BOOL)animated{
-    if(index >= self.viewControllers.count){
+    if (index >= self.viewControllers.count) {
         return;
     }
     UIViewController* c = [self.viewControllers objectAtIndex:index];
     [self popToViewController:c animated:animated];
 }
-- (void)popControllersCount:(NSInteger)count animated:(BOOL)animated{
-    if(count + 1 > self.viewControllers.count){
-        [self popToRootViewControllerAnimated:animated];
+- (void)popToViewControllerOfClass:(Class)controlelrClass animated:(BOOL)animated{
+    if (self.viewControllers.count == 0) {
+        return;
+    }
+    __block UIViewController* popToController = nil;
+    [self.viewControllers enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(UIViewController * obj, NSUInteger idx, BOOL *  stop) {
+        if ([obj isKindOfClass:controlelrClass]) {
+            popToController = obj;
+            *stop = YES;
+        }
+    }];
+    if (popToController) {
+        [self popToViewController:popToController animated:animated];
     }
     else{
+        [self popViewControllerAnimated:YES];
+    }
+}
+- (void)popViewControllersOfCount:(NSInteger)count animated:(BOOL)animated{
+    if (count + 1 > self.viewControllers.count) {
+        [self popToRootViewControllerAnimated:animated];
+    }
+    else {
         UIViewController* c = [self.viewControllers objectAtIndex:self.viewControllers.count-1-count];
         [self popToViewController:c animated:YES];
     }
@@ -622,7 +663,7 @@
     [urlString deleteCharactersInRange:NSMakeRange(urlString.length-1, 1)];
     return urlString;
 }
-- (NSDictionary*)dictionaryOfUrlParams{
+- (NSDictionary*)urlParamDictionary{
     NSString* params = self;
     NSRange range = [self rangeOfString:@"?"];
     if(range.location != NSNotFound && range.location != self.length-1){
@@ -643,27 +684,41 @@
     }
     return d;
 }
+
+- (NSString*)percentEncodingString{
+    if (SystemVersionBiggerOrEqual(@"7.0")) {
+        return [self stringByAddingPercentEncodingWithAllowedCharacters:[NSMutableCharacterSet URLQueryAllowedCharacterSet]];
+    }
+    else {
+        return [self stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+    }
+}
+- (NSURL*)urlValue{
+    NSString* percentEncodingString = [self percentEncodingString];
+    return [NSURL URLWithString:percentEncodingString];
+}
+
 - (long long) hexadecimalValue{
     if(self.length == 0){
         return 0;
     }
     long long ans = 0;
-    NSUInteger times = 1;
+    NSUInteger times = 0;
     for(NSInteger i = self.length - 1; i >= 0; i--){
         unichar c = [self characterAtIndex:i];
         // 数字
-        if(c <= 0x39){
-            ans += (c - 0x30) * times;
+        if(c <= '9'){
+            ans += (c - '0') << times;
         }
         // 大写字母
-        else if(c <= 0x5a){
-            ans += (c - 0x41 + 10) * times;
+        else if(c <= 'A'){
+            ans += (c - 'A' + 10) << times;
         }
         // 小写字母
         else{
-            ans += (c - 0x61 + 10) * times;
+            ans += (c - 'a' + 10) << times;
         }
-        times *= 16;
+        times += 4;
     }
     return ans;
 }
@@ -675,7 +730,34 @@
 }
 @end
 
-@implementation  NSMutableArray (CDZArrayExtension)
+@implementation NSArray (CDZArrayExtension)
+- (id)objectOfClass:(Class)objectClass{
+    if (objectClass == nil) {
+        return nil;
+    }
+    for (id obj in self) {
+        if ([obj isKindOfClass:objectClass]) {
+            return obj;
+        }
+    }
+    return nil;
+}
+- (NSUInteger)indexOfObjectOfClass:(Class)objectClass{
+    if (objectClass == nil) {
+        return NSNotFound;
+    }
+    NSUInteger index = 0;
+    for (id obj in self) {
+        if ([obj isKindOfClass:objectClass]) {
+            return index;
+        }
+        index++;
+    }
+    return NSNotFound;
+}
+@end
+
+@implementation  NSMutableArray (CDZMutableArrayExtension)
 - (void)removeFirstObject{
     if(self.count > 0){
         [self removeObjectAtIndex:0];
@@ -788,6 +870,14 @@ static void releaseAssetCallback(void *info){
         return object;
     }
 }
+- (NSMutableArray*)array{
+    NSMutableArray* array = [NSMutableArray array];
+    for (NSString* key in self) {
+        id obj = [self objectForKey:key];
+        [array addObject:obj];
+    }
+    return array;
+}
 @end
 
 @implementation NSDate (CDZDateExtension)
@@ -814,15 +904,15 @@ static void releaseAssetCallback(void *info){
     }
     return string;
 }
+- (NSString*)absoluteString{
+    NSCharacterSet* set = [NSCharacterSet characterSetWithCharactersInString:@"< >"];
+    return [[self.description componentsSeparatedByCharactersInSet:set] componentsJoinedByString:@""];
+}
 @end
 
 @implementation NSError (CDZErrorExtension)
-- (NSString*)errorMessage{
-    return [NSString stringWithFormat:@"Error Code: %zd\nDomain: %@\nDescription: %@\nReason: %@",
-            self.code,
-            self.domain,
-            self.localizedDescription,
-            self.localizedFailureReason];
+- (instancetype)initWithDomain:(NSString *)domain code:(NSInteger)code localizedDescription:(NSString*)description{
+    return [self initWithDomain:domain code:code userInfo:@{NSLocalizedDescriptionKey:StringNotNil(description)}];
 }
 @end
 

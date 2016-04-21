@@ -12,6 +12,9 @@
 #define RGB(r,g,b)      [UIColor colorWithRed:(r)/255.0 green:(g)/255.0 blue:(b)/255.0 alpha:1]
 #define RGBA(r,g,b,a)   [UIColor colorWithRed:(r)/255.0 green:(g)/255.0 blue:(b)/255.0 alpha:(a)]
 
+#define SystemVersionBiggerOrEqual(version) ([[UIDevice currentDevice].systemVersion compare:(version) options:NSNumericSearch] != NSOrderedAscending)
+#define SystemVersionBiggerThan(version) ([[UIDevice currentDevice].systemVersion compare:(version) options:NSNumericSearch] == NSOrderedDescending)
+
 #define IPhone4ScreenHeight     480
 #define IPhone5ScreenHeight     568
 #define IPhone6ScreenHeight     667
@@ -106,6 +109,7 @@
 + (UIImage*)roundImageOfColor:(UIColor*)color borderColor:(UIColor*)borderColor borderWidth:(CGFloat)borderWidth radius:(CGFloat)radius scale:(CGFloat)scale;
 
 - (UIImage*)stretchableImage;
+- (UIImage*)imageWithTintColor:(UIColor*)color;
 
 // 缩小图片尺寸（如果本身就小于指定尺寸，则不进行任何处理）
 - (UIImage*)zoomoutToSize:(CGSize)size;
@@ -143,6 +147,8 @@
 - (UIColor*)lightColor;
 - (UIColor*)darkColor;
 - (UIColor*)disableColor;
+
+- (BOOL)isEqualToColor:(UIColor*)color;
 @end
 
 #pragma mark - UIViewController
@@ -153,7 +159,8 @@
 
 @interface UINavigationController (CDZNavigationControllerExtension)
 - (void)popToViewControllerAtIndex:(NSInteger)index animated:(BOOL)animated;
-- (void)popControllersCount:(NSInteger)count animated:(BOOL)animated;
+- (void)popToViewControllerOfClass:(Class)controlelrClass animated:(BOOL)animated;
+- (void)popViewControllersOfCount:(NSInteger)count animated:(BOOL)animated;
 @end
 
 @interface UIApplication (CDZApplicationExtension)
@@ -190,13 +197,22 @@
 - (void)enumerateCharactersUsingBlock:(void (^)(unichar c, NSUInteger idx, BOOL *stop))block;
 
 - (NSString*)urlStringWithParamsDictionary:(NSDictionary*)dic;
-- (NSDictionary*)dictionaryOfUrlParams;
+- (NSDictionary*)urlParamDictionary;
+
+- (NSString*)percentEncodingString;
+- (NSURL*)urlValue;
+
 - (long long) hexadecimalValue;
 
 - (NSMutableAttributedString*)attributedStringWithAttribute:(NSString*)attribute value:(id)value range:(NSRange)range;
 @end
 
-@interface NSMutableArray (CDZArrayExtension)
+@interface NSArray (CDZArrayExtension)
+- (id)objectOfClass:(Class)objectClass;
+- (NSUInteger)indexOfObjectOfClass:(Class)objectClass;
+@end
+
+@interface NSMutableArray (CDZMutableArrayExtension)
 - (void)removeFirstObject;
 @end
 
@@ -210,6 +226,7 @@
 
 @interface NSDictionary (CDZDictionaryExtension)
 - (id)objectExceptNullForKey:(id)aKey;
+- (NSMutableArray*)array;
 @end
 
 @interface NSDate (CDZDateExtension)
@@ -220,9 +237,10 @@
 @interface NSData (CDZDataExtension)
 - (NSString*)stringWithEncoding:(NSStringEncoding)encoding;
 - (NSString*)stringValue;
+- (NSString*)absoluteString;
 @end
 
 @interface NSError (CDZErrorExtension)
-- (NSString*)errorMessage;
+- (instancetype)initWithDomain:(NSString *)domain code:(NSInteger)code localizedDescription:(NSString*)description;
 @end
 
