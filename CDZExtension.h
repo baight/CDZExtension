@@ -20,18 +20,17 @@
 #define IPhone6ScreenHeight     667
 #define IPhone6PlusScreenHeight 736
 
-#define GCDAsyncInMain(block)        dispatch_async(dispatch_get_main_queue(), (block))
-#define GCDSyncInMain(block)         dispatch_sync(dispatch_get_main_queue(), (block))
-#define GCDAsyncInMainAfter(time, block) dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC*(time)), dispatch_get_main_queue(), (block))
-
-#define GCDAsyncInBackground(block)  dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), (block))
-#define GCDSyncInBackground(block)   dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), (block))
-#define GCDAsyncInBackgroundAfter(time, block) dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC*(time)), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), (block))
-
-
-
 #define StringNotNil(str) (str ? str : @"")
 #define ArrayNotNil(arr) (arr ? arr : @[])
+
+void GCDAsyncInMain(dispatch_block_t block);
+void GCDSyncInMain(dispatch_block_t block);
+void GCDAsyncInMainAfter(NSTimeInterval time, dispatch_block_t block);
+
+void GCDAsyncInBackground(dispatch_block_t block);
+void GCDSyncInBackground(dispatch_block_t block);
+void GCDAsyncInBackgroundAfter(NSTimeInterval time, dispatch_block_t block);
+
 
 #pragma mark - UIView
 @interface UIView (CDZViewExtension)
@@ -96,6 +95,11 @@
 
 - (NSInteger)totalPage;
 - (NSInteger)currentPage;
+@end
+
+@interface CALayer (CDZLayerExtension)
+- (void)resumeAnimation;
+- (void)pauseAnimation;
 @end
 
 @interface UILabel (CDZLabelExtension)

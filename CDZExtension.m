@@ -9,6 +9,26 @@
 #import "CDZExtension.h"
 #import <ImageIO/ImageIO.h>
 
+inline void GCDAsyncInMain(dispatch_block_t block){
+    dispatch_async(dispatch_get_main_queue(), block);
+}
+inline void GCDSyncInMain(dispatch_block_t block){
+    dispatch_sync(dispatch_get_main_queue(), block);
+}
+inline void GCDAsyncInMainAfter(NSTimeInterval time, dispatch_block_t block){
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC*(time)), dispatch_get_main_queue(), block);
+}
+
+inline void GCDAsyncInBackground(dispatch_block_t block){
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), block);
+}
+inline void GCDSyncInBackground(dispatch_block_t block){
+    dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), block);
+}
+inline void GCDAsyncInBackgroundAfter(NSTimeInterval time, dispatch_block_t block){
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC*(time)), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), block);
+}
+
 #pragma mark - UIView
 @implementation UIView (CDZViewExtension)
 + (id)loadFromBundleWithOwner:(id)owner{
@@ -216,7 +236,7 @@
 }
 - (void)addLeftLine:(UIColor*)color edgeInsets:(UIEdgeInsets)insets{
     CGFloat lineWidth = 1/[UIScreen mainScreen].scale;
-    UIView* v = [[UIView alloc]initWithFrame:CGRectMake(insets.left, insets.top, lineWidth, self.height - insets.top - insets.bottom)];
+    UIView* v = [[UIView alloc]initWithFrame:CGRectMake(insets.left-lineWidth, insets.top, lineWidth, self.height - insets.top - insets.bottom)];
     v.autoresizingMask = UIViewAutoresizingFlexibleHeight;
     v.backgroundColor = color;
     [self addSubview:v];
@@ -264,6 +284,22 @@
         page++;
     }
     return page;
+}
+@end
+
+@implementation CALayer (CDZLayerExtension)
+- (void)resumeAnimation{
+    CFTimeInterval pausedTime = [self timeOffset];
+    self.timeOffset = 0.0;
+    self.speed = 1.0;
+    self.beginTime = 0;
+    CFTimeInterval timeSincePause = [self convertTime:CACurrentMediaTime() fromLayer:nil] - pausedTime;
+    self.beginTime = timeSincePause;
+}
+- (void)pauseAnimation{
+    CFTimeInterval pausedTime = [self convertTime:CACurrentMediaTime() fromLayer:nil];
+    self.timeOffset = pausedTime;
+    self.speed = 0.0;
 }
 @end
 
@@ -525,22 +561,8 @@
 
 @implementation UIApplication (CDZApplicationExtension)
 - (UIViewController*)topViewController{
-    UIWindow * window = [self keyWindow];
-    if (window.windowLevel != UIWindowLevelNormal){
-        NSArray *windows = [self windows];
-        for(UIWindow * tmpWin in windows){
-            if (tmpWin.windowLevel == UIWindowLevelNormal && !tmpWin.hidden){
-                window = tmpWin;
-                break;
-            }
-        }
-    }
-    UIView *frontView = [[window subviews] firstObject];
-    UIViewController* controller = [frontView viewController];
-    if(controller == nil){
-        controller = window.rootViewController;
-    }
-    
+    UIWindow * window = [self appWindow];
+    UIViewController* controller = window.rootViewController;
     do{
         while (controller.presentedViewController) {
             controller = controller.presentedViewController;
@@ -550,7 +572,7 @@
             controller = [nav topViewController];
         }
         else if ([controller isKindOfClass:[UIViewController class]]){
-            controller = controller;
+            //controller = controller;
         }
         else{
             break;
