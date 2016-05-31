@@ -12,6 +12,8 @@
 #define RGB(r,g,b)      [UIColor colorWithRed:(r)/255.0 green:(g)/255.0 blue:(b)/255.0 alpha:1]
 #define RGBA(r,g,b,a)   [UIColor colorWithRed:(r)/255.0 green:(g)/255.0 blue:(b)/255.0 alpha:(a)]
 
+#define OnePixelsWidth  (1/[UIScreen mainScreen].scale)
+
 #define SystemVersionBiggerOrEqual(version) ([[UIDevice currentDevice].systemVersion compare:(version) options:NSNumericSearch] != NSOrderedAscending)
 #define SystemVersionBiggerThan(version) ([[UIDevice currentDevice].systemVersion compare:(version) options:NSNumericSearch] == NSOrderedDescending)
 
@@ -65,7 +67,7 @@ void GCDAsyncInBackgroundAfter(NSTimeInterval time, dispatch_block_t block);
 - (UIImage*)snapshoot;
 
 - (void)removeAllSubviews;
-- (UIView*)viewWithClass:(Class)c;
+- (__kindof UIView*)viewWithClass:(Class)c;
 
 // 移动自己 到 view 的右边，与其间距 interval
 - (void)moveToRightOfView:(UIView*)view interval:(CGFloat)interval;
@@ -208,7 +210,10 @@ void GCDAsyncInBackgroundAfter(NSTimeInterval time, dispatch_block_t block);
 
 - (long long) hexadecimalValue;
 
+- (BOOL)matchesRegex:(NSString*)regex;
+- (NSMutableAttributedString*)attributedString;
 - (NSMutableAttributedString*)attributedStringWithAttribute:(NSString*)attribute value:(id)value range:(NSRange)range;
+- (NSMutableAttributedString*)attributedStringAddingImage:(UIImage*)image atIndex:(NSUInteger)index offset:(CGPoint)offset;
 @end
 
 @interface NSArray (CDZArrayExtension)
@@ -235,6 +240,9 @@ void GCDAsyncInBackgroundAfter(NSTimeInterval time, dispatch_block_t block);
 
 @interface NSDate (CDZDateExtension)
 + (NSString*)stringFromTimeIntervalSince1970:(NSTimeInterval)timeInterval formate:(NSString*)formate;
++ (NSDate*)dateFromString:(NSString*)dateString formate:(NSString*)formate;
+
+- (NSDateComponents*)components;
 - (NSString*)stringWithFormat:(NSString*)formate;
 @end
 
@@ -242,6 +250,10 @@ void GCDAsyncInBackgroundAfter(NSTimeInterval time, dispatch_block_t block);
 - (NSString*)stringWithEncoding:(NSStringEncoding)encoding;
 - (NSString*)stringValue;
 - (NSString*)absoluteString;
+@end
+
+@interface UIFont (CDZFontExtension)
++ (UIFont*)lightSystemFontOfSize:(CGFloat)size;
 @end
 
 @interface NSError (CDZErrorExtension)

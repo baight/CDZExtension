@@ -157,7 +157,7 @@ inline void GCDAsyncInBackgroundAfter(NSTimeInterval time, dispatch_block_t bloc
         [v removeFromSuperview];
     }
 }
-- (UIView*)viewWithClass:(Class)c;{
+- (__kindof UIView*)viewWithClass:(Class)c;{
     for(UIView* v in self.subviews){
         if( [v isMemberOfClass:c]){
             return v;
@@ -745,9 +745,26 @@ inline void GCDAsyncInBackgroundAfter(NSTimeInterval time, dispatch_block_t bloc
     return ans;
 }
 
+- (BOOL)matchesRegex:(NSString*)regex{
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", regex];
+    return [predicate evaluateWithObject:self];
+}
+- (NSMutableAttributedString*)attributedString{
+    NSMutableAttributedString* mas = [[NSMutableAttributedString alloc]initWithString:self];
+    return mas;
+}
 - (NSMutableAttributedString*)attributedStringWithAttribute:(NSString*)attribute value:(id)value range:(NSRange)range{
     NSMutableAttributedString* mas = [[NSMutableAttributedString alloc]initWithString:self];
     [mas addAttribute:attribute value:value range:range];
+    return mas;
+}
+- (NSMutableAttributedString*)attributedStringAddingImage:(UIImage*)image atIndex:(NSUInteger)index offset:(CGPoint)offset{
+    NSTextAttachment* textAttachment = [[NSTextAttachment alloc]init];
+    textAttachment.image = image;
+    textAttachment.bounds = CGRectMake(offset.x, -offset.y, image.size.width, image.size.height);
+    NSAttributedString* imageAttributedString = [NSAttributedString attributedStringWithAttachment:textAttachment];
+    NSMutableAttributedString* mas = [[NSMutableAttributedString alloc]initWithString:self];
+    [mas insertAttributedString:imageAttributedString atIndex:index];
     return mas;
 }
 @end
@@ -907,6 +924,21 @@ static void releaseAssetCallback(void *info){
     NSDate* date = [[NSDate alloc]initWithTimeIntervalSince1970:timeInterval];
     return [date stringWithFormat:formate];
 }
++ (NSDate*)dateFromString:(NSString*)dateString formate:(NSString*)formate{
+    if (dateString == nil || formate == nil) {
+        return nil;
+    }
+    NSDateFormatter* formatter = [[NSDateFormatter alloc]init];
+    [formatter setDateFormat:formate];
+    return [formatter dateFromString:dateString];
+}
+
+- (NSDateComponents*)components{
+    NSCalendar *calendar = [NSCalendar currentCalendar];
+    NSInteger unitFlags = NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit | NSWeekdayCalendarUnit | NSHourCalendarUnit | NSMinuteCalendarUnit | NSSecondCalendarUnit;
+    NSDateComponents* comps = [calendar components:unitFlags fromDate:self];
+    return comps;
+}
 - (NSString*)stringWithFormat:(NSString*)formate{
     NSDateFormatter* formatter = [[NSDateFormatter alloc]init];
     [formatter setDateFormat:formate];
@@ -929,6 +961,12 @@ static void releaseAssetCallback(void *info){
 - (NSString*)absoluteString{
     NSCharacterSet* set = [NSCharacterSet characterSetWithCharactersInString:@"< >"];
     return [[self.description componentsSeparatedByCharactersInSet:set] componentsJoinedByString:@""];
+}
+@end
+
+@implementation UIFont (CDZFontExtension)
++ (UIFont*)lightSystemFontOfSize:(CGFloat)size{
+    return [UIFont fontWithName:@"STHeitiSC-Light" size:size];
 }
 @end
 
