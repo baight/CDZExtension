@@ -24,9 +24,14 @@
 
 #define StringNotNil(str) (str ? str : @"")
 #define ArrayNotNil(arr) (arr ? arr : @[])
+#define DictionaryNotNil(dic) (dic ? dic : @{})
+
+#define RegexPhoneNumber        @"^1\\d{10}$"
+#define RegexNumberOnly         @"^[0-9]*$"
 
 void GCDAsyncInMain(dispatch_block_t block);
 void GCDSyncInMain(dispatch_block_t block);
+void GCDSafeSyncInMain(dispatch_block_t block); // 不会阻塞主线程
 void GCDAsyncInMainAfter(NSTimeInterval time, dispatch_block_t block);
 
 void GCDAsyncInBackground(dispatch_block_t block);
@@ -69,6 +74,8 @@ void GCDAsyncInBackgroundAfter(NSTimeInterval time, dispatch_block_t block);
 - (void)removeAllSubviews;
 - (__kindof UIView*)viewWithClass:(Class)c;
 
+- (__kindof UIView*)theFirstResponder;
+
 // 移动自己 到 view 的右边，与其间距 interval
 - (void)moveToRightOfView:(UIView*)view interval:(CGFloat)interval;
 - (void)moveToBottomnOfView:(UIView*)view interval:(CGFloat)interval;
@@ -77,18 +84,18 @@ void GCDAsyncInBackgroundAfter(NSTimeInterval time, dispatch_block_t block);
 //获取 view 的 controller
 - (UIViewController *)viewController;
 
-- (void)addTopLine:(UIColor*)color;
-- (void)addTopLine:(UIColor *)color edgeInsets:(UIEdgeInsets)insets;
+- (UIView*)addTopLine:(UIColor*)color;
+- (UIView*)addTopLine:(UIColor *)color edgeInsets:(UIEdgeInsets)insets;
 
 
-- (void)addBottomLine:(UIColor*)color;
-- (void)addBottomLine:(UIColor*)color edgeInsets:(UIEdgeInsets)insets;
+- (UIView*)addBottomLine:(UIColor*)color;
+- (UIView*)addBottomLine:(UIColor*)color edgeInsets:(UIEdgeInsets)insets;
 
-- (void)addLeftLine:(UIColor*)color;
-- (void)addLeftLine:(UIColor*)color edgeInsets:(UIEdgeInsets)insets;
+- (UIView*)addLeftLine:(UIColor*)color;
+- (UIView*)addLeftLine:(UIColor*)color edgeInsets:(UIEdgeInsets)insets;
 
-- (void)addRightLine:(UIColor*)color;
-- (void)addRightLine:(UIColor*)color edgeInsets:(UIEdgeInsets)insets;
+- (UIView*)addRightLine:(UIColor*)color;
+- (UIView*)addRightLine:(UIColor*)color edgeInsets:(UIEdgeInsets)insets;
 @end
 
 @interface UIScrollView (CDZScrollViewExtension)
@@ -105,7 +112,19 @@ void GCDAsyncInBackgroundAfter(NSTimeInterval time, dispatch_block_t block);
 @end
 
 @interface UILabel (CDZLabelExtension)
+- (instancetype)initWithTextColor:(UIColor*)textColor fontSize:(CGFloat)fontSize;
+
 - (CGSize)textSize;
+@end
+
+@interface UITextField (CDZTextFieldExtension)
+@property (nonatomic, assign) CGFloat leftPadding;
+@property (nonatomic, assign) CGFloat rightPadding;
+@end
+
+@interface UIButton (CDZButtonExtension)
+- (instancetype)initWithTitleColor:(UIColor*)titleColor fontSize:(CGFloat)fontSize;
+- (instancetype)initWithTitleColor:(UIColor*)titleColor fontSize:(CGFloat)fontSize backgroundColor:(UIColor*)backgroundColor;
 @end
 
 @interface UIImage (CDZImageExtension)
@@ -211,6 +230,7 @@ void GCDAsyncInBackgroundAfter(NSTimeInterval time, dispatch_block_t block);
 - (long long) hexadecimalValue;
 
 - (BOOL)matchesRegex:(NSString*)regex;
+
 - (NSMutableAttributedString*)attributedString;
 - (NSMutableAttributedString*)attributedStringWithAttribute:(NSString*)attribute value:(id)value range:(NSRange)range;
 - (NSMutableAttributedString*)attributedStringAddingImage:(UIImage*)image atIndex:(NSUInteger)index offset:(CGPoint)offset;
@@ -241,6 +261,7 @@ void GCDAsyncInBackgroundAfter(NSTimeInterval time, dispatch_block_t block);
 @interface NSDate (CDZDateExtension)
 + (NSString*)stringFromTimeIntervalSince1970:(NSTimeInterval)timeInterval formate:(NSString*)formate;
 + (NSDate*)dateFromString:(NSString*)dateString formate:(NSString*)formate;
++ (NSDate*)today;
 
 - (NSDateComponents*)components;
 - (NSString*)stringWithFormat:(NSString*)formate;

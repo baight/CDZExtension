@@ -15,6 +15,14 @@ inline void GCDAsyncInMain(dispatch_block_t block){
 inline void GCDSyncInMain(dispatch_block_t block){
     dispatch_sync(dispatch_get_main_queue(), block);
 }
+inline void GCDSafeSyncInMain(dispatch_block_t block){
+    if ([NSThread isMainThread]) {
+        block();
+    }
+    else {
+        dispatch_sync(dispatch_get_main_queue(), block);
+    }
+}
 inline void GCDAsyncInMainAfter(NSTimeInterval time, dispatch_block_t block){
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC*(time)), dispatch_get_main_queue(), block);
 }
@@ -166,6 +174,19 @@ inline void GCDAsyncInBackgroundAfter(NSTimeInterval time, dispatch_block_t bloc
     return nil;
 }
 
+- (__kindof UIView*)theFirstResponder{
+    if (self.isFirstResponder) {
+        return self;
+    }
+    for (UIView *subView in self.subviews) {
+        id responder = [subView theFirstResponder];
+        if (responder) {
+            return responder;
+        }
+    }
+    return nil;
+}
+
 - (void)moveToRightOfView:(UIView *)view interval:(CGFloat)interval{
     CGSize size = view.bounds.size;
     if([view isKindOfClass:[UILabel class]]){
@@ -211,45 +232,49 @@ inline void GCDAsyncInBackgroundAfter(NSTimeInterval time, dispatch_block_t bloc
     return nil;
 }
 
-- (void)addTopLine:(UIColor*)color{
-    [self addTopLine:color edgeInsets:UIEdgeInsetsMake(0, 0, 0, 0)];
+- (UIView*)addTopLine:(UIColor*)color{
+    return [self addTopLine:color edgeInsets:UIEdgeInsetsMake(0, 0, 0, 0)];
 }
-- (void)addTopLine:(UIColor *)color edgeInsets:(UIEdgeInsets)insets{
+- (UIView*)addTopLine:(UIColor *)color edgeInsets:(UIEdgeInsets)insets{
     CGFloat lineWidth = 1/[UIScreen mainScreen].scale;
     UIView* v = [[UIView alloc]initWithFrame:CGRectMake(insets.left, -lineWidth + insets.top, self.width-insets.left - insets.right, lineWidth)];
     v.autoresizingMask = UIViewAutoresizingFlexibleWidth;
     v.backgroundColor = color;
     [self addSubview:v];
+    return v;
 }
-- (void)addBottomLine:(UIColor*)color{
-    [self addBottomLine:color edgeInsets:UIEdgeInsetsMake(0, 0, 0, 0)];
+- (UIView*)addBottomLine:(UIColor*)color{
+    return [self addBottomLine:color edgeInsets:UIEdgeInsetsMake(0, 0, 0, 0)];
 }
-- (void)addBottomLine:(UIColor*)color edgeInsets:(UIEdgeInsets)insets;{
+- (UIView*)addBottomLine:(UIColor*)color edgeInsets:(UIEdgeInsets)insets;{
     CGFloat lineWidth = 1/[UIScreen mainScreen].scale;
     UIView* v = [[UIView alloc]initWithFrame:CGRectMake(insets.left, self.height-lineWidth - insets.bottom, self.width - insets.left - insets.right, lineWidth)];
     v.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleWidth;
     v.backgroundColor = color;
     [self addSubview:v];
+    return v;
 }
-- (void)addLeftLine:(UIColor*)color{
-    [self addLeftLine:color edgeInsets:UIEdgeInsetsMake(0, 0, 0, 0)];
+- (UIView*)addLeftLine:(UIColor*)color{
+    return [self addLeftLine:color edgeInsets:UIEdgeInsetsMake(0, 0, 0, 0)];
 }
-- (void)addLeftLine:(UIColor*)color edgeInsets:(UIEdgeInsets)insets{
+- (UIView*)addLeftLine:(UIColor*)color edgeInsets:(UIEdgeInsets)insets{
     CGFloat lineWidth = 1/[UIScreen mainScreen].scale;
     UIView* v = [[UIView alloc]initWithFrame:CGRectMake(insets.left-lineWidth, insets.top, lineWidth, self.height - insets.top - insets.bottom)];
     v.autoresizingMask = UIViewAutoresizingFlexibleHeight;
     v.backgroundColor = color;
     [self addSubview:v];
+    return v;
 }
-- (void)addRightLine:(UIColor*)color{
-    [self addRightLine:color edgeInsets:UIEdgeInsetsMake(0, 0, 0, 0)];
+- (UIView*)addRightLine:(UIColor*)color{
+    return [self addRightLine:color edgeInsets:UIEdgeInsetsMake(0, 0, 0, 0)];
 }
-- (void)addRightLine:(UIColor*)color edgeInsets:(UIEdgeInsets)insets{
+- (UIView*)addRightLine:(UIColor*)color edgeInsets:(UIEdgeInsets)insets{
     CGFloat lineWidth = 1/[UIScreen mainScreen].scale;
     UIView* v = [[UIView alloc]initWithFrame:CGRectMake(self.width - lineWidth - insets.right, insets.top, lineWidth, self.height - insets.top - insets.bottom)];
     v.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleHeight;
     v.backgroundColor = color;
     [self addSubview:v];
+    return v;
 }
 
 @end
@@ -304,8 +329,68 @@ inline void GCDAsyncInBackgroundAfter(NSTimeInterval time, dispatch_block_t bloc
 @end
 
 @implementation UILabel(CDZLabelExtension)
+- (instancetype)initWithTextColor:(UIColor*)textColor fontSize:(CGFloat)fontSize{
+    if (self = [super init]) {
+        if (textColor) {
+            self.textColor = textColor;
+        }
+        if (fontSize > 0) {
+            self.font = [UIFont systemFontOfSize:fontSize];
+        }
+        self.backgroundColor = [UIColor clearColor];
+    }
+    return self;
+}
 - (CGSize)textSize{
     return [self.text sizeWithFont:self.font];
+}
+@end
+
+@implementation UITextField (CDZTextFieldExtension)
+- (CGFloat)leftPadding{
+    return self.leftView.frame.size.width;
+}
+- (void)setLeftPadding:(CGFloat)leftPadding{
+    if (self.leftView == nil) {
+        self.leftView = [[UIView alloc]init];
+        self.leftViewMode = UITextFieldViewModeAlways;
+    }
+    CGRect frame = self.leftView.frame;
+    frame.size.width = leftPadding;
+    self.leftView.frame = frame;
+}
+- (CGFloat)rightPadding{
+    return self.rightView.frame.size.width;
+}
+- (void)setRightPadding:(CGFloat)rightPadding{
+    if (self.rightView == nil) {
+        self.rightView = [[UIView alloc]init];
+        self.rightViewMode = UITextFieldViewModeAlways;
+    }
+    CGRect frame = self.rightView.frame;
+    frame.size.width = rightPadding;
+    self.rightView.frame = frame;
+}
+@end
+
+@implementation UIButton (CDZButtonExtension)
+- (instancetype)initWithTitleColor:(UIColor*)titleColor fontSize:(CGFloat)fontSize{
+    return [self initWithTitleColor:titleColor fontSize:fontSize backgroundColor:nil];
+}
+- (instancetype)initWithTitleColor:(UIColor*)titleColor fontSize:(CGFloat)fontSize backgroundColor:(UIColor*)backgroundColor{
+    if (self = [super init]) {
+        if (titleColor) {
+            [self setTitleColor:titleColor forState:UIControlStateNormal];
+            [self setTitleColor:titleColor.darkColor forState:UIControlStateHighlighted];
+        }
+        if (fontSize > 0) {
+            self.titleLabel.font = [UIFont systemFontOfSize:fontSize];
+        }
+        if (backgroundColor) {
+            [self setBackgroundImage:[UIImage imageOfColor:backgroundColor] forState:UIControlStateNormal];
+        }
+    }
+    return self;
 }
 @end
 
@@ -686,10 +771,18 @@ inline void GCDAsyncInBackgroundAfter(NSTimeInterval time, dispatch_block_t bloc
     return urlString;
 }
 - (NSDictionary*)urlParamDictionary{
-    NSString* params = self;
-    NSRange range = [self rangeOfString:@"?"];
-    if(range.location != NSNotFound && range.location != self.length-1){
-        params = [self substringFromIndex:range.location+1];
+    NSString* urlString;
+    if (SystemVersionBiggerOrEqual(@"7.0")){
+        urlString = [self stringByRemovingPercentEncoding];
+    }
+    else {
+        urlString = [self stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+    }
+    
+    NSString* params = urlString;
+    NSRange range = [urlString rangeOfString:@"?"];
+    if(range.location != NSNotFound && range.location != urlString.length-1){
+        params = [urlString substringFromIndex:range.location+1];
     }
     
     NSMutableDictionary* d = [NSMutableDictionary dictionary];
@@ -931,6 +1024,19 @@ static void releaseAssetCallback(void *info){
     NSDateFormatter* formatter = [[NSDateFormatter alloc]init];
     [formatter setDateFormat:formate];
     return [formatter dateFromString:dateString];
+}
++ (NSDate*)today{
+    NSDate* now = [NSDate date];
+    NSCalendar *calendar = [NSCalendar currentCalendar];
+    
+    NSInteger unitFlags = NSYearCalendarUnit | NSMonthCalendarUnit | NSDayCalendarUnit | NSWeekdayCalendarUnit | NSHourCalendarUnit | NSMinuteCalendarUnit | NSSecondCalendarUnit;
+    NSDateComponents* components = [calendar components:unitFlags fromDate:now];
+    
+    components.hour = 0;
+    components.minute = 0;
+    components.second = 0;
+    
+    return [calendar dateFromComponents:components];
 }
 
 - (NSDateComponents*)components{
