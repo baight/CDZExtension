@@ -1224,7 +1224,7 @@ static void releaseAssetCallback(void *info){
     NSUInteger maxLenth = [string maximumLengthOfBytesUsingEncoding:encoding];
     NSUInteger offset = self.length;
     self.length += maxLenth;
-    NSUInteger usedLength;
+    NSUInteger usedLength = 0;
     [string getBytes:self.mutableBytes+offset maxLength:maxLenth usedLength:&usedLength encoding:encoding options:NSStringEncodingConversionExternalRepresentation range:NSMakeRange(0, string.length) remainingRange:NULL];
     self.length -= maxLenth-usedLength;
 }
