@@ -14,7 +14,9 @@
 + (NSData*)dataFromBase64String:(NSString*)str NS_AVAILABLE(10_9, 7_0);
 - (NSString*)base64EncodedString NS_AVAILABLE(10_9, 7_0);
 
-- (NSString*)md5StringValue;
+- (NSString*)md5String;
+- (NSString*)hmacSHA1StringWithSecret:(NSString*)secret;
+- (NSString*)hmacSHA256StringWithSecret:(NSString*)secret;
 
 // DES
 - (NSData *)DESEncryptWithKey:(NSString *)key;
@@ -23,6 +25,14 @@
 // AES
 - (NSData *)AES256EncryptWithKey:(NSString *)key;
 - (NSData *)AES256DecryptWithKey:(NSString *)key;
+
+@end
+
+
+
+@interface NSString (CDZSecurityExtension)
+
+- (NSString*)md5StringWithUTF8Encoding;
 
 @end
 

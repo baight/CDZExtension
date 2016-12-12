@@ -64,6 +64,15 @@ inline void GCDAsyncInBackgroundAfter(NSTimeInterval time, dispatch_block_t bloc
 - (CGFloat)y{
     return self.frame.origin.y;
 }
+- (CGPoint)origin{
+    return self.frame.origin;
+}
+- (void)setOrigin:(CGPoint)origin{
+    CGRect frame = self.frame;
+    frame.origin = origin;
+    self.frame = frame;
+}
+
 - (CGFloat)right{
     return CGRectGetMaxX(self.frame);
 }
@@ -191,7 +200,7 @@ inline void GCDAsyncInBackgroundAfter(NSTimeInterval time, dispatch_block_t bloc
     CGSize size = view.bounds.size;
     if([view isKindOfClass:[UILabel class]]){
         UILabel* label = (UILabel*)view;
-        size = [label.text sizeWithFont:label.font];
+        size = [label textSize];
         if(size.width > view.bounds.size.width){
             size.width = view.bounds.size.width;
         }
@@ -205,7 +214,7 @@ inline void GCDAsyncInBackgroundAfter(NSTimeInterval time, dispatch_block_t bloc
     CGSize size = view.bounds.size;
     if([view isKindOfClass:[UILabel class]]){
         UILabel* label = (UILabel*)view;
-        size = [label.text sizeWithFont:label.font];
+        size = [label textSize];
         if(size.width > view.bounds.size.width){
             size.width = view.bounds.size.width;
         }
@@ -342,7 +351,7 @@ inline void GCDAsyncInBackgroundAfter(NSTimeInterval time, dispatch_block_t bloc
     return self;
 }
 - (CGSize)textSize{
-    return [self.text sizeWithFont:self.font];
+    return [self.text sizeWithAttributes:@{NSFontAttributeName:self.font}];
 }
 @end
 
@@ -486,6 +495,94 @@ inline void GCDAsyncInBackgroundAfter(NSTimeInterval time, dispatch_block_t bloc
     UIGraphicsEndImageContext();
     return newImage;
 }
+- (UIImage*)scaleToSize:(CGSize)size contentMode:(UIViewContentMode)contentMode{
+    return [self scaleToSize:size contentMode:contentMode backgroundColor:nil];
+}
+- (UIImage*)scaleToSize:(CGSize)size contentMode:(UIViewContentMode)contentMode backgroundColor:(UIColor*)bgColor{
+    CGSize mySize = CGSizeMake(self.size.width*self.scale, self.size.height*self.scale);
+    CGSize workSize = CGSizeMake(size.width*[UIScreen mainScreen].scale, size.height*[UIScreen mainScreen].scale);
+    CGRect destRect;
+    switch (contentMode) {
+        case UIViewContentModeScaleToFill:
+            destRect = CGRectMake(0, 0, workSize.width, workSize.height);
+            break;
+        case UIViewContentModeScaleAspectFit:
+            // 先假设以宽为基准
+            destRect.size.width = workSize.width;
+            destRect.origin.x = 0;
+            destRect.size.height = workSize.width * mySize.height/mySize.width;
+            destRect.origin.y = (workSize.height - destRect.size.height)/2;
+            // 如果假设不成立，则改为以高为基准
+            if(destRect.size.height > workSize.height){
+                destRect.size.height = workSize.height;
+                destRect.origin.y = 0;
+                destRect.size.width = workSize.height * mySize.width/mySize.height;
+                destRect.origin.x = (workSize.width - destRect.size.width)/2;
+            }
+            break;
+        case UIViewContentModeScaleAspectFill:
+            // 先假设以宽为基准
+            destRect.size.width = workSize.width;
+            destRect.origin.x = 0;
+            destRect.size.height = workSize.width * mySize.height/mySize.width;
+            destRect.origin.y = (workSize.height - destRect.size.height)/2;
+            // 如果假设不成立，则改为以高为基准
+            if(destRect.size.height < workSize.height){
+                destRect.size.height = workSize.height;
+                destRect.origin.y = 0;
+                destRect.size.width = workSize.height * mySize.width/mySize.height;
+                destRect.origin.x = (workSize.width - destRect.size.width)/2;
+            }
+            break;
+        case UIViewContentModeCenter:
+            destRect = CGRectMake((workSize.width-mySize.width)/2, (workSize.height-mySize.height)/2, mySize.width, mySize.height);
+            break;
+        case UIViewContentModeTop:
+            destRect = CGRectMake((workSize.width-mySize.width)/2, 0, mySize.width, mySize.height);
+            break;
+        case UIViewContentModeBottom:
+            destRect = CGRectMake((workSize.width-mySize.width)/2, workSize.height-mySize.height, mySize.width, mySize.height);
+            break;
+        case UIViewContentModeLeft:
+            destRect = CGRectMake(0, (workSize.height-mySize.height)/2, mySize.width, mySize.height);
+            break;
+        case UIViewContentModeRight:
+            destRect = CGRectMake(workSize.width-mySize.width, (workSize.height-mySize.height)/2, mySize.width, mySize.height);
+            break;
+        case UIViewContentModeTopLeft:
+            destRect = CGRectMake(0, 0, mySize.width, mySize.height);
+            break;
+        case UIViewContentModeTopRight:
+            destRect = CGRectMake(workSize.width-mySize.width, 0, mySize.width, mySize.height);
+            break;
+        case UIViewContentModeBottomLeft:
+            destRect = CGRectMake(0, workSize.height-mySize.height, mySize.width, mySize.height);
+            break;
+        case UIViewContentModeBottomRight:
+            destRect = CGRectMake(workSize.width-mySize.width, workSize.height-mySize.height, mySize.width, mySize.height);
+            break;
+        default:
+            destRect = CGRectMake(0, 0, workSize.width, workSize.height);
+            break;
+    }
+    
+    CGFloat scale = [UIScreen mainScreen].scale;
+    destRect.origin.x /= scale;
+    destRect.origin.y /= scale;
+    destRect.size.width /= scale;
+    destRect.size.height /= scale;
+    
+    UIGraphicsBeginImageContextWithOptions(size, NO, scale);
+    if (bgColor) {
+        CGContextRef context = UIGraphicsGetCurrentContext();
+        CGContextSetFillColorWithColor(context, bgColor.CGColor);
+        CGContextFillRect(context, CGRectMake(0, 0, size.width, size.height));
+    }
+    [self drawInRect:destRect];
+    UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return newImage;
+}
 @end
 
 @interface CDZClearFooterView : UIView
@@ -587,11 +684,7 @@ inline void GCDAsyncInBackgroundAfter(NSTimeInterval time, dispatch_block_t bloc
     }
 }
 - (BOOL)isEqualToColor:(UIColor*)color{
-    CGFloat redValue, greenValue, blueValue, alphaValue;
-    CGFloat myRedValue, myGreenValue, myBlueValue, myAlphaValue;
-    [color getRed:&redValue green:&greenValue blue:&blueValue alpha:&alphaValue];
-    [self getRed:&myRedValue green:&myGreenValue blue:&myBlueValue alpha:&myAlphaValue];
-    return (redValue == myRedValue && greenValue == myGreenValue && blueValue == myBlueValue && alphaValue == myAlphaValue);
+    return CGColorEqualToColor(self.CGColor, color.CGColor);
 }
 @end
 
@@ -751,10 +844,21 @@ inline void GCDAsyncInBackgroundAfter(NSTimeInterval time, dispatch_block_t bloc
     }
 }
 
-- (NSString*)urlStringWithParamsDictionary:(NSDictionary*)dic{
+- (NSString*)urlStringWithParamterDictionary:(NSDictionary*)dic{
+    return [self urlStringWithParamterDictionary:dic addingPercentEncoding:NO];
+}
+- (NSString*)urlStringWithParamterDictionary:(NSDictionary*)dic addingPercentEncoding:(BOOL)addingPercentEncoding{
     if(dic.count == 0){
         return [self copy];
     }
+    BOOL isBiggerOrEqual_7_0 = SystemVersionBiggerOrEqual(@"7.0");
+    NSMutableCharacterSet* allowedCharacterSet = nil;
+    if (addingPercentEncoding && isBiggerOrEqual_7_0) {
+        allowedCharacterSet = [[NSMutableCharacterSet alloc]init];
+        [allowedCharacterSet formUnionWithCharacterSet:[NSCharacterSet URLQueryAllowedCharacterSet]];
+        [allowedCharacterSet removeCharactersInString:@"=&?"];
+    }
+    
     NSMutableString* urlString = [[NSMutableString alloc]initWithString:self];
     NSRange range = [urlString rangeOfString:@"?"];
     if(range.location == NSNotFound){
@@ -763,26 +867,34 @@ inline void GCDAsyncInBackgroundAfter(NSTimeInterval time, dispatch_block_t bloc
     else if(![urlString hasSuffix:@"&"]){
         [urlString appendString:@"&"];
     }
-    for(NSString* key in dic){
+    for(NSString* k in dic){
+        NSString* key = k;
         NSString* value = dic[key];
+        if (addingPercentEncoding) {
+            if (isBiggerOrEqual_7_0) {
+                key = [key stringByAddingPercentEncodingWithAllowedCharacters:allowedCharacterSet];
+                value = [value stringByAddingPercentEncodingWithAllowedCharacters:allowedCharacterSet];
+            }
+            else{
+                key = [key stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+                value = [value stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+            }
+        }
         [urlString appendFormat:@"%@=%@&", key, value];
     }
     [urlString deleteCharactersInRange:NSMakeRange(urlString.length-1, 1)];
     return urlString;
 }
-- (NSDictionary*)urlParamDictionary{
-    NSString* urlString;
-    if (SystemVersionBiggerOrEqual(@"7.0")){
-        urlString = [self stringByRemovingPercentEncoding];
-    }
-    else {
-        urlString = [self stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-    }
+- (NSDictionary*)urlParamterDictionary{
+    return [self urlParamterDictionaryRemovingPercentEncoding:YES];
+}
+- (NSDictionary*)urlParamterDictionaryRemovingPercentEncoding:(BOOL)removingPercentEncoding{
+    BOOL isBiggerOrEqual_7_0 = SystemVersionBiggerOrEqual(@"7.0");
     
-    NSString* params = urlString;
-    NSRange range = [urlString rangeOfString:@"?"];
-    if(range.location != NSNotFound && range.location != urlString.length-1){
-        params = [urlString substringFromIndex:range.location+1];
+    NSString* params = self;
+    NSRange range = [self rangeOfString:@"?"];
+    if(range.location != NSNotFound && range.location != self.length-1){
+        params = [self substringFromIndex:range.location+1];
     }
     
     NSMutableDictionary* d = [NSMutableDictionary dictionary];
@@ -793,6 +905,16 @@ inline void GCDAsyncInBackgroundAfter(NSTimeInterval time, dispatch_block_t bloc
             NSString* key = [keyValue firstObject];
             NSString* value = [keyValue lastObject];
             if(key && value){
+                if (removingPercentEncoding) {
+                    if (isBiggerOrEqual_7_0) {
+                        key = [key stringByRemovingPercentEncoding];
+                        value = [value stringByRemovingPercentEncoding];
+                    }
+                    else{
+                        key = [key stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+                        value = [value stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+                    }
+                }
                 [d setObject:value forKey:key];
             }
         }
@@ -862,6 +984,16 @@ inline void GCDAsyncInBackgroundAfter(NSTimeInterval time, dispatch_block_t bloc
 }
 @end
 
+@implementation NSURL (CDZURLExtentsion)
+- (NSDictionary*)paramterDictionary{
+    return [self paramterDictionaryRemovingPercentEncoding:YES];
+}
+- (NSDictionary*)paramterDictionaryRemovingPercentEncoding:(BOOL)removingPercentEncoding{
+    NSString* params = [self query];
+    return [params urlParamterDictionaryRemovingPercentEncoding:removingPercentEncoding];
+}
+@end
+
 @implementation NSArray (CDZArrayExtension)
 - (id)objectOfClass:(Class)objectClass{
     if (objectClass == nil) {
@@ -893,6 +1025,20 @@ inline void GCDAsyncInBackgroundAfter(NSTimeInterval time, dispatch_block_t bloc
 - (void)removeFirstObject{
     if(self.count > 0){
         [self removeObjectAtIndex:0];
+    }
+}
+- (void)removeObjectOfClass:(Class)objectClass{
+    if (objectClass == nil) {
+        return;
+    }
+    NSMutableArray* needRemoveOjbects = [[NSMutableArray alloc]init];
+    for (id obj in self) {
+        if ([obj isKindOfClass:objectClass]) {
+            [needRemoveOjbects addObject:obj];
+        }
+    }
+    for (id obj in needRemoveOjbects) {
+        [self removeObject:obj];
     }
 }
 @end
@@ -1067,6 +1213,20 @@ static void releaseAssetCallback(void *info){
 - (NSString*)absoluteString{
     NSCharacterSet* set = [NSCharacterSet characterSetWithCharactersInString:@"< >"];
     return [[self.description componentsSeparatedByCharactersInSet:set] componentsJoinedByString:@""];
+}
+@end
+
+@implementation NSMutableData(CDZMutableDataExtension)
+- (void)appendString:(NSString*)string{
+    [self appendString:string encoding:NSUTF8StringEncoding];
+}
+- (void)appendString:(NSString*)string encoding:(NSStringEncoding)encoding{
+    NSUInteger maxLenth = [string maximumLengthOfBytesUsingEncoding:encoding];
+    NSUInteger offset = self.length;
+    self.length += maxLenth;
+    NSUInteger usedLength;
+    [string getBytes:self.mutableBytes+offset maxLength:maxLenth usedLength:&usedLength encoding:encoding options:NSStringEncodingConversionExternalRepresentation range:NSMakeRange(0, string.length) remainingRange:NULL];
+    self.length -= maxLenth-usedLength;
 }
 @end
 

@@ -9,6 +9,7 @@
 #import "CDZSecurityExtension.h"
 #import <CommonCrypto/CommonCryptor.h>
 #import <CommonCrypto/CommonDigest.h>
+#include <CommonCrypto/CommonHMAC.h>
 
 @implementation NSData (CDZSecurityExtension)
 
@@ -20,7 +21,7 @@
     return [self base64EncodedStringWithOptions:0];
 }
 
-- (NSString*)md5StringValue{
+- (NSString*)md5String{
     unsigned char result[16];
     CC_MD5(self.bytes, (CC_LONG)self.length, result); // This is the md5 call
     return [NSString stringWithFormat:
@@ -30,6 +31,20 @@
             result[8], result[9], result[10], result[11],
             result[12], result[13], result[14], result[15]
             ];
+}
+- (NSString*)hmacSHA1StringWithSecret:(NSString*)secret{
+    const char *cKey  = [secret cStringUsingEncoding:NSASCIIStringEncoding];
+    NSMutableData* hashData = [NSMutableData dataWithLength:CC_SHA1_DIGEST_LENGTH];
+    CCHmac(kCCHmacAlgSHA1, cKey, strlen(cKey), self.bytes, self.length, hashData.mutableBytes);
+    NSString *hashBase64String = [hashData base64EncodedString];
+    return hashBase64String;
+}
+- (NSString*)hmacSHA256StringWithSecret:(NSString*)secret{
+    const char *cKey  = [secret cStringUsingEncoding:NSASCIIStringEncoding];
+    NSMutableData* hashData = [NSMutableData dataWithLength:CC_SHA256_DIGEST_LENGTH];
+    CCHmac(kCCHmacAlgSHA256, cKey, strlen(cKey), self.bytes, self.length, hashData.mutableBytes);
+    NSString *hashBase64String = [hashData base64EncodedString];
+    return hashBase64String;
 }
 
 // DES
@@ -119,6 +134,16 @@
     }
     free(buffer);
     return nil;
+}
+
+@end
+
+
+@implementation NSString (CDZSecurityExtension)
+
+- (NSString*)md5StringWithUTF8Encoding{
+    NSData* data = [self dataUsingEncoding:NSUTF8StringEncoding];
+    return [data md5String];
 }
 
 @end

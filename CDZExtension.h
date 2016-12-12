@@ -44,6 +44,7 @@ void GCDAsyncInBackgroundAfter(NSTimeInterval time, dispatch_block_t block);
 
 @property (nonatomic, assign) CGFloat x;
 @property (nonatomic, assign) CGFloat y;
+@property (nonatomic, assign) CGPoint origin;
 @property (nonatomic, assign) CGFloat right;
 @property (nonatomic, assign) CGFloat bottom;
 
@@ -114,7 +115,7 @@ void GCDAsyncInBackgroundAfter(NSTimeInterval time, dispatch_block_t block);
 @interface UILabel (CDZLabelExtension)
 - (instancetype)initWithTextColor:(UIColor*)textColor fontSize:(CGFloat)fontSize;
 
-- (CGSize)textSize;
+- (CGSize)textSize NS_AVAILABLE(10_0, 7_0);
 @end
 
 @interface UITextField (CDZTextFieldExtension)
@@ -142,6 +143,8 @@ void GCDAsyncInBackgroundAfter(NSTimeInterval time, dispatch_block_t block);
 // 缩放图片尺寸
 - (UIImage*)scaleToSize:(CGSize)size;
 - (UIImage*)scaleToSize:(CGSize)size aspect:(bool)aspect;
+- (UIImage*)scaleToSize:(CGSize)size contentMode:(UIViewContentMode)contentMode;
+- (UIImage*)scaleToSize:(CGSize)size contentMode:(UIViewContentMode)contentMode backgroundColor:(UIColor*)bgColor;
 @end
 
 @interface UITableView (CDZTableViewExtension)
@@ -221,9 +224,18 @@ void GCDAsyncInBackgroundAfter(NSTimeInterval time, dispatch_block_t block);
 
 - (void)enumerateCharactersUsingBlock:(void (^)(unichar c, NSUInteger idx, BOOL *stop))block;
 
-- (NSString*)urlStringWithParamsDictionary:(NSDictionary*)dic;
-- (NSDictionary*)urlParamDictionary;
+// 对字符串后边添加url格式的参数。默认对不参数不进行百分号编码。
+- (NSString*)urlStringWithParamterDictionary:(NSDictionary*)dic;
+// 对字符串后边添加url格式的参数。addingPercentEncoding表示是否对参数进行百分号编码。
+- (NSString*)urlStringWithParamterDictionary:(NSDictionary*)dic addingPercentEncoding:(BOOL)addingPercentEncoding;
 
+
+// 获取字符串中的url参数。默认对参数进行反百分号解码。
+- (NSDictionary*)urlParamterDictionary;
+// 获取字符串中的url参数。removingPercentEncoding表示是否进行百分号解码。
+- (NSDictionary*)urlParamterDictionaryRemovingPercentEncoding:(BOOL)removingPercentEncoding;
+
+// 对字符串进行百分号编码。
 - (NSString*)percentEncodingString;
 - (NSURL*)urlValue;
 
@@ -236,6 +248,13 @@ void GCDAsyncInBackgroundAfter(NSTimeInterval time, dispatch_block_t block);
 - (NSMutableAttributedString*)attributedStringAddingImage:(UIImage*)image atIndex:(NSUInteger)index offset:(CGPoint)offset;
 @end
 
+@interface NSURL (CDZURLExtentsion)
+// 获取url中的参数。默认对参数进行反百分号解码。
+- (NSDictionary*)paramterDictionary;
+// 获取url中的参数。removingPercentEncoding表示是否进行百分号解码。
+- (NSDictionary*)paramterDictionaryRemovingPercentEncoding:(BOOL)removingPercentEncoding;
+@end
+
 @interface NSArray (CDZArrayExtension)
 - (id)objectOfClass:(Class)objectClass;
 - (NSUInteger)indexOfObjectOfClass:(Class)objectClass;
@@ -243,6 +262,7 @@ void GCDAsyncInBackgroundAfter(NSTimeInterval time, dispatch_block_t block);
 
 @interface NSMutableArray (CDZMutableArrayExtension)
 - (void)removeFirstObject;
+- (void)removeObjectOfClass:(Class)objectClass;
 @end
 
 @interface ALAsset (CDZAssetExtension)
@@ -271,6 +291,11 @@ void GCDAsyncInBackgroundAfter(NSTimeInterval time, dispatch_block_t block);
 - (NSString*)stringWithEncoding:(NSStringEncoding)encoding;
 - (NSString*)stringValue;
 - (NSString*)absoluteString;
+@end
+
+@interface NSMutableData (CDZMutableDataExtension)
+- (void)appendString:(NSString*)string;     // use NSUTF8StringEncoding
+- (void)appendString:(NSString*)string encoding:(NSStringEncoding)encoding;
 @end
 
 @interface UIFont (CDZFontExtension)
