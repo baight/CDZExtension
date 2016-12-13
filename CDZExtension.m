@@ -844,10 +844,10 @@ inline void GCDAsyncInBackgroundAfter(NSTimeInterval time, dispatch_block_t bloc
     }
 }
 
-- (NSString*)urlStringWithParamterDictionary:(NSDictionary*)dic{
-    return [self urlStringWithParamterDictionary:dic addingPercentEncoding:NO];
+- (NSString*)stringByAppendingURLQueryDictionary:(NSDictionary*)dic{
+    return [self stringByAppendingURLQueryDictionary:dic addingPercentEncoding:NO];
 }
-- (NSString*)urlStringWithParamterDictionary:(NSDictionary*)dic addingPercentEncoding:(BOOL)addingPercentEncoding{
+- (NSString*)stringByAppendingURLQueryDictionary:(NSDictionary*)dic addingPercentEncoding:(BOOL)addingPercentEncoding{
     if(dic.count == 0){
         return [self copy];
     }
@@ -885,10 +885,10 @@ inline void GCDAsyncInBackgroundAfter(NSTimeInterval time, dispatch_block_t bloc
     [urlString deleteCharactersInRange:NSMakeRange(urlString.length-1, 1)];
     return urlString;
 }
-- (NSDictionary*)urlParamterDictionary{
-    return [self urlParamterDictionaryRemovingPercentEncoding:YES];
+- (NSDictionary*)URLQueryDictionary{
+    return [self URLQueryDictionaryWithRemovingPercentEncoding:YES];
 }
-- (NSDictionary*)urlParamterDictionaryRemovingPercentEncoding:(BOOL)removingPercentEncoding{
+- (NSDictionary*)URLQueryDictionaryWithRemovingPercentEncoding:(BOOL)removingPercentEncoding{
     BOOL isBiggerOrEqual_7_0 = SystemVersionBiggerOrEqual(@"7.0");
     
     NSString* params = self;
@@ -985,12 +985,12 @@ inline void GCDAsyncInBackgroundAfter(NSTimeInterval time, dispatch_block_t bloc
 @end
 
 @implementation NSURL (CDZURLExtentsion)
-- (NSDictionary*)paramterDictionary{
-    return [self paramterDictionaryRemovingPercentEncoding:YES];
+- (NSDictionary*)queryDictionary{
+    return [self queryDictionaryWithRemovingPercentEncoding:YES];
 }
-- (NSDictionary*)paramterDictionaryRemovingPercentEncoding:(BOOL)removingPercentEncoding{
+- (NSDictionary*)queryDictionaryWithRemovingPercentEncoding:(BOOL)removingPercentEncoding{
     NSString* params = [self query];
-    return [params urlParamterDictionaryRemovingPercentEncoding:removingPercentEncoding];
+    return [params URLQueryDictionaryWithRemovingPercentEncoding:removingPercentEncoding];
 }
 @end
 

@@ -225,15 +225,13 @@ void GCDAsyncInBackgroundAfter(NSTimeInterval time, dispatch_block_t block);
 - (void)enumerateCharactersUsingBlock:(void (^)(unichar c, NSUInteger idx, BOOL *stop))block;
 
 // 对字符串后边添加url格式的参数。默认对不参数不进行百分号编码。
-- (NSString*)urlStringWithParamterDictionary:(NSDictionary*)dic;
+- (NSString*)stringByAppendingURLQueryDictionary:(NSDictionary*)dic;
 // 对字符串后边添加url格式的参数。addingPercentEncoding表示是否对参数进行百分号编码。
-- (NSString*)urlStringWithParamterDictionary:(NSDictionary*)dic addingPercentEncoding:(BOOL)addingPercentEncoding;
-
-
+- (NSString*)stringByAppendingURLQueryDictionary:(NSDictionary*)dic addingPercentEncoding:(BOOL)addingPercentEncoding;
 // 获取字符串中的url参数。默认对参数进行反百分号解码。
-- (NSDictionary*)urlParamterDictionary;
+- (NSDictionary*)URLQueryDictionary;
 // 获取字符串中的url参数。removingPercentEncoding表示是否进行百分号解码。
-- (NSDictionary*)urlParamterDictionaryRemovingPercentEncoding:(BOOL)removingPercentEncoding;
+- (NSDictionary*)URLQueryDictionaryWithRemovingPercentEncoding:(BOOL)removingPercentEncoding;
 
 // 对字符串进行百分号编码。
 - (NSString*)percentEncodingString;
@@ -250,9 +248,9 @@ void GCDAsyncInBackgroundAfter(NSTimeInterval time, dispatch_block_t block);
 
 @interface NSURL (CDZURLExtentsion)
 // 获取url中的参数。默认对参数进行反百分号解码。
-- (NSDictionary*)paramterDictionary;
+- (NSDictionary*)queryDictionary;
 // 获取url中的参数。removingPercentEncoding表示是否进行百分号解码。
-- (NSDictionary*)paramterDictionaryRemovingPercentEncoding:(BOOL)removingPercentEncoding;
+- (NSDictionary*)queryDictionaryWithRemovingPercentEncoding:(BOOL)removingPercentEncoding;
 @end
 
 @interface NSArray (CDZArrayExtension)
